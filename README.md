@@ -80,6 +80,13 @@ SNS：`site.json` の `sns`。URLが空のものは表示しない（TikTokを�
 3. アクセス解析を入れるので、「個人情報の取り扱い」ページにアクセス解析（Cookie）を使う旨を一文足す。
 4. `robots.txt`・`sitemap.xml`・`index.html` の canonical は `https://www.sciencemunakata.tech/` で用意済み（www なしにするなら3か所を直す）。
 
+### アクセス解析の設定（2026-11-10 済み）
+- プロパティ「サイエンス里山ラボ宗像 WEBサイト」（ID 563459915、測定ID G-EYWX2Y198N）。データ保持は14か月。サーチコンソール（sciencemunakata.tech）とリンク済み。
+- サイトが送るイベント：`apply_class`（授業の「LINEで申し込む」。`class_title` に授業名 → カスタムディメンション「申し込みされた授業」）、`join_form`（入会フォーム）、`line_click`（友だち追加・問い合わせなどそのほかのLINEボタン）。
+- キーイベント：`apply_class` と `join_form` を、最初のデータが届いたあと（管理 → イベント の一覧に出てから）☆でキーイベントにする。
+- 運営側の閲覧は数えない：`?me=1` を付けてサイトを一度ひらく か 管理画面をひらいた端末は `traffic_type=internal` になり、データフィルタ「Internal Traffic」（有効）で除かれる。`?me=0` で解除。http→https に変わると端末の記憶が別になるので、https化のあとにもう一度 `?me=1` でひらく。
+- LINEからのリンクには `utm_source=line`（リッチメニュー `utm_medium=richmenu`／プロフィール `utm_medium=profile`）を付けている。
+
 ## 絵のアイコン・3つの輪・「なぜ？」の吹き出し（GPTでつくった絵）
 - 元の絵（白背景）は `_tools/src/gpt/` にある。アイコンは3×3で9個ずつ並んだシートが3枚。
 - `python3 _tools/cut_gpt.py` で背景を透明にして切り出す。
