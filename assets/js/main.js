@@ -98,9 +98,24 @@
     document.head.appendChild(s);
     window.dataLayer = window.dataLayer || [];
     window.gtag = function () { dataLayer.push(arguments); };
-    gtag('js', new Date()); gtag('config', id);
-    // LINEボタンが押された回数もはかる
-    document.addEventListener('click', e => { if (e.target.closest('.js-line, .btn-line, .lf-btn')) gtag('event', 'line_click'); });
+    gtag('js', new Date()); gtag('config', id, isMe() ? { traffic_type: 'internal' } : {});
+    // 押されたボタンを記録：授業の申し込み（apply_class）／入会フォーム（join_form）／LINEの友だち追加・問い合わせ（line_click）
+    document.addEventListener('click', e => {
+      const a = e.target.closest('a'); if (!a) return;
+      const h = a.getAttribute('href') || '';
+      if (h.includes('oaMessage')) gtag('event', 'apply_class', { class_title: a.dataset.class || '' });
+      else if (/forms\.gle|docs\.google\.com\/forms/.test(h)) gtag('event', 'join_form');
+      else if (a.matches('.js-line, .btn-line, .lf-btn')) gtag('event', 'line_click');
+    });
+  }
+  // 自分（運営側）のアクセスは数えない：?me=1 を付けて一度ひらく か 管理画面をひらいた端末は「内部」になる（?me=0 で解除）
+  function isMe() {
+    try {
+      const q = new URLSearchParams(location.search).get('me');
+      if (q === '1') localStorage.setItem('sato_me', '1');
+      if (q === '0') localStorage.removeItem('sato_me');
+      return localStorage.getItem('sato_me') === '1';
+    } catch (e) { return false; }
   }
 
   /* ───── SNS（メニューの下・フッター・Instagramの帯） ───── */
@@ -165,7 +180,7 @@
       </div>
       <div class="next-side">
         <p class="countdown">${n === 0 ? '<b>きょう</b>！' : `あと<b>${n}</b>日`}</p>
-        <a class="btn btn-line" href="${esc(applyUrl(c))}" target="_blank" rel="noopener">${lineIcon}LINEで申し込む</a>
+        <a class="btn btn-line" href="${esc(applyUrl(c))}" data-class="${esc(window.SATO_APPLY ? window.SATO_APPLY.label(c) : c.title)}" target="_blank" rel="noopener">${lineIcon}LINEで申し込む</a>
         <p class="apply-hint">記入欄つきの文が入った状態でLINEが開きます</p>
         <p style="margin:10px 0 0"><a href="#" data-open="${esc(c.id)}">くわしく見る →</a></p>
       </div>
@@ -335,7 +350,7 @@
         ${gal ? `<p class="md-sub">授業のようす</p><div class="md-gallery">${gal}</div>` : ''}
         ${c.notes?.length ? `<ul class="md-notes">${c.notes.map(n => `<li>${er(n)}</li>`).join('')}</ul>` : ''}
         ${t ? `<div class="md-teacher">${t.photo ? `<img src="${esc(t.photo)}" alt="">` : ''}<p><b>${esc(t.name)} 先生</b><br>${esc(t.bio)}</p></div>` : ''}
-        ${!st ? `<div class="md-cta"><a class="btn btn-line" href="${esc(applyUrl(c))}" target="_blank" rel="noopener">${lineIcon}LINEで申し込む</a><p class="apply-hint">記入欄つきの文が入った状態でLINEが開きます。空欄をうめて送ってください</p></div>` : ''}
+        ${!st ? `<div class="md-cta"><a class="btn btn-line" href="${esc(applyUrl(c))}" data-class="${esc(window.SATO_APPLY ? window.SATO_APPLY.label(c) : c.title)}" target="_blank" rel="noopener">${lineIcon}LINEで申し込む</a><p class="apply-hint">記入欄つきの文が入った状態でLINEが開きます。空欄をうめて送ってください</p></div>` : ''}
       </div></div>`;
     modal.showModal();
     $('#classModalBody').scrollTop = 0;

@@ -23,8 +23,21 @@
     if (ga && /^G-[A-Z0-9]+$/.test(ga)) {
       const s = document.createElement('script'); s.async = true; s.src = `https://www.googletagmanager.com/gtag/js?id=${ga}`; document.head.appendChild(s);
       window.dataLayer = window.dataLayer || []; window.gtag = function () { dataLayer.push(arguments); };
-      gtag('js', new Date()); gtag('config', ga);
-      document.addEventListener('click', e => { if (e.target.closest('.js-line, .btn-line, .lf-btn')) gtag('event', 'line_click'); });
+      let me = false;  // 運営側の端末（?me=1 か 管理画面をひらいた端末）は「内部」として数えない
+      try {
+        const q = new URLSearchParams(location.search).get('me');
+        if (q === '1') localStorage.setItem('sato_me', '1');
+        if (q === '0') localStorage.removeItem('sato_me');
+        me = localStorage.getItem('sato_me') === '1';
+      } catch (e) {}
+      gtag('js', new Date()); gtag('config', ga, me ? { traffic_type: 'internal' } : {});
+      document.addEventListener('click', e => {
+        const a = e.target.closest('a'); if (!a) return;
+        const h = a.getAttribute('href') || '';
+        if (h.includes('oaMessage')) gtag('event', 'apply_class', { class_title: a.dataset.class || '' });
+        else if (/forms\.gle|docs\.google\.com\/forms/.test(h)) gtag('event', 'join_form');
+        else if (a.matches('.js-line, .btn-line, .lf-btn')) gtag('event', 'line_click');
+      });
     }
     watchLine();
   }).catch(err => console.error(err));
