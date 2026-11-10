@@ -36,7 +36,7 @@ def page(slug, title, en, icon, lead, chara, body, desc):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{B}assets/css/style.css?v=202611101254">
+<link rel="stylesheet" href="{B}assets/css/style.css?v=202611101536">
 </head>
 <body class="subpage" data-base="{B}">
 
@@ -115,8 +115,8 @@ def page(slug, title, en, icon, lead, chara, body, desc):
   </div>
 </div>
 
-<script src="{B}assets/js/icons.js?v=202611101254"></script>
-<script src="{B}assets/js/page.js?v=202611101254"></script>
+<script src="{B}assets/js/icons.js?v=202611101536"></script>
+<script src="{B}assets/js/page.js?v=202611101536"></script>
 </body>
 </html>
 '''
