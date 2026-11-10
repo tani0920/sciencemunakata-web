@@ -39,7 +39,17 @@ SNS：`site.json` の `sns`。URLが空のものは表示しない（TikTokを�
 - 文章は `_tools/build_pages.py` に書いてある。直したら `python3 _tools/build_pages.py` で3ページを書き出し直す（ヘッダー・フッターもトップとそろう）。
 - 共通の部品：`assets/js/icons.js`（アイコン。トップと共通）、`assets/js/page.js`（メニュー・SNS・LINEボタン・目次）。
 
-## 更新のしかた（いまは手で JSON を書き換え → 次に管理アプリを作る）
+## 公開（GitHub Pages）と管理画面
+
+- リポジトリ：https://github.com/tani0920/sciencemunakata-web （public、`main` ブランチの直下をそのまま公開）
+- 仮のアドレス：https://tani0920.github.io/sciencemunakata-web/ （ドメイン切り替え後は https://www.sciencemunakata.tech/ ）
+- このフォルダ（OneDrive）がそのまま作業コピー。`.git` は OneDrive の外（`~/.git-repos/sciencemunakata-web`）に置いている（同期で壊れないように）。`_tools/src/`（元の絵・差し替え前の写真）は公開しない（`.gitignore`）。
+- **管理画面**：`/admin/`（https://tani0920.github.io/sciencemunakata-web/admin/ ）。お知らせ・授業・先生・動画をフォームで追加・編集・削除。写真は端末の中で縮小して WebP にする（お知らせ 長辺1400／授業の表紙 800×600・告知画像 640×800・ようす 長辺1200／先生 360×360）。保存すると画像と JSON を1回のコミットで GitHub に書き込み、1〜2分で反映。
+  - カギ：GitHub の fine-grained personal access token（このリポジトリだけ・Contents を Read and write）。端末のブラウザ（localStorage）にだけ保存。
+  - 保存のたびに最新の JSON を読み直してから変更を当てるので、2台で同時に触っても上書き事故は起きにくい。
+  - **管理画面で更新すると、GitHub のほうが新しくなる。手元（このフォルダ）で直す前に必ず `git pull` する。**
+
+## 更新のしかた（手で直すとき）
 
 - 授業を足す：`classes.json` に1件追加。並び順は気にしなくてよい（日付で自動並べ替え）。
 - 動画を足す：YouTube の動画ID（`watch?v=` のあとの11文字）を、その授業の `videoId` に入れる。**限定公開の道順動画は入れない。**
@@ -50,8 +60,9 @@ SNS：`site.json` の `sns`。URLが空のものは表示しない（TikTokを�
 
 ## まだのこと
 
-- [ ] 更新用の管理アプリ（お知らせ・授業・先生・動画を入力 → GitHub に保存）
-- [ ] GitHub Pages に公開 → ムームードメインで sciencemunakata.tech を切り替え（Google のメール設定 MX・SPF・確認TXT・DMARC を残す）
+- [x] 更新用の管理画面（`/admin/`）
+- [x] GitHub Pages に公開（仮のアドレス）
+- [ ] ドメイン切り替え → ムームードメインで sciencemunakata.tech を切り替え（Google のメール設定 MX・SPF・確認TXT・DMARC を残す）
 - [ ] 里山ラボ サイエンスアプリ（会員コード・1つおためし）
 
 ## 公開するときにいっしょにやること（Google アナリティクス／サーチコンソール）

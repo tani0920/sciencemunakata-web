@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>管理画面｜サイエンス里山ラボ宗像</title>
+<link rel="icon" href="../assets/img/favicon.png">
+<style>
+  :root {
+    --blue: #3B6FC1; --blue-l: #E6EEFB; --pink: #E6336F; --pink-l: #FDE6EE;
+    --leaf: #5DB63E; --leaf-l: #E5F4DC; --sun: #FFC53D; --sun-l: #FFF3CF;
+    --ink: #26314D; --ink-2: #56607A; --paper: #FFFBF1; --line: #06C755; --r: 14px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.7 "Hiragino Maru Gothic ProN", "Hiragino Sans", "Zen Maru Gothic", sans-serif; }
+  header { position: sticky; top: 0; z-index: 5; background: #fff; border-bottom: 2px solid var(--ink); }
+  .bar { max-width: 880px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .bar h1 { font-size: 16px; margin: 0; flex: 1; min-width: 160px; }
+  .bar h1 small { display: block; font-size: 11px; color: var(--ink-2); font-weight: normal; }
+  .tabs { max-width: 880px; margin: 0 auto; padding: 0 12px; display: flex; gap: 4px; overflow-x: auto; }
+  .tabs button { border: 0; background: none; padding: 10px 14px; font: inherit; font-weight: bold; color: var(--ink-2); border-bottom: 4px solid transparent; cursor: pointer; white-space: nowrap; }
+  .tabs button.on { color: var(--ink); border-color: var(--sun); }
+  main { max-width: 880px; margin: 0 auto; padding: 18px 16px 120px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 2px solid var(--ink); border-radius: 999px; padding: 8px 18px; background: #fff; color: var(--ink); font: inherit; font-weight: bold; cursor: pointer; text-decoration: none; line-height: 1.3; }
+  .btn.main { background: var(--sun); }
+  .btn.blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .btn.danger { color: var(--pink); border-color: var(--pink); }
+  .btn.small { padding: 4px 12px; font-size: 13px; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .card { background: #fff; border: 2px solid var(--ink); border-radius: var(--r); padding: 18px; margin-bottom: 16px; }
+  .list { list-style: none; margin: 0; padding: 0; }
+  .list li { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px dashed #ccd; }
+  .list li:last-child { border-bottom: 0; }
+  .list img { width: 64px; height: 48px; object-fit: cover; border-radius: 8px; background: var(--blue-l); flex: none; }
+  .list .t { flex: 1; min-width: 0; }
+  .list .t b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .list .t small { color: var(--ink-2); }
+  .tag { display: inline-block; font-size: 11px; padding: 0 8px; border-radius: 999px; background: var(--blue-l); color: var(--blue); margin-right: 4px; }
+  .tag.past { background: #eee; color: #888; }
+  .tag.stop { background: var(--pink-l); color: var(--pink); }
+  .head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .head h2 { margin: 0; font-size: 18px; }
+  label.f { display: block; margin: 14px 0 4px; font-weight: bold; font-size: 14px; }
+  label.f small { font-weight: normal; color: var(--ink-2); margin-left: 6px; }
+  input[type=text], input[type=date], input[type=url], input[type=password], select, textarea {
+    width: 100%; padding: 9px 11px; border: 2px solid #c9cfdc; border-radius: 10px; font: inherit; background: #fff; color: var(--ink);
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--blue); }
+  textarea { min-height: 120px; resize: vertical; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0 12px; }
+  .imgs { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+  .imgs figure { margin: 0; position: relative; }
+  .imgs img { display: block; width: 120px; height: 90px; object-fit: cover; border-radius: 8px; border: 2px solid #c9cfdc; }
+  .imgs img.tall { width: 90px; height: 112px; }
+  .imgs img.sq { width: 90px; height: 90px; }
+  .imgs figure button { position: absolute; top: -8px; right: -8px; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink); background: #fff; cursor: pointer; font-weight: bold; line-height: 1; }
+  .imgs .new { outline: 3px solid var(--sun); outline-offset: 1px; border-radius: 8px; }
+  .pick { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border: 2px dashed var(--blue); border-radius: 10px; color: var(--blue); font-weight: bold; cursor: pointer; background: var(--blue-l); }
+  .pick input { display: none; }
+  .links-ed .lr { display: grid; grid-template-columns: 1fr 1.4fr auto; gap: 6px; margin-bottom: 6px; }
+  .check { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .hint { font-size: 13px; color: var(--ink-2); margin: 4px 0 0; }
+  .actions { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 2px solid var(--ink); padding: 10px 16px; z-index: 6; }
+  .actions .in { max-width: 880px; margin: 0 auto; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .actions .sp { flex: 1; }
+  .toast { position: fixed; left: 50%; top: 80px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 12px; z-index: 20; max-width: 90vw; box-shadow: 0 6px 20px rgba(0,0,0,.2); }
+  .toast.ng { background: var(--pink); }
+  .busy { position: fixed; inset: 0; background: rgba(255,251,241,.75); display: flex; align-items: center; justify-content: center; z-index: 30; font-weight: bold; font-size: 17px; }
+  .setup ol { padding-left: 1.3em; }
+  .setup li { margin-bottom: 6px; }
+  code { background: var(--blue-l); padding: 1px 6px; border-radius: 6px; font-size: 13px; }
+  .muted { color: var(--ink-2); }
+  .err { color: var(--pink); font-weight: bold; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <h1>サイエンス里山ラボ宗像 管理画面<small>お知らせ・授業・先生・動画の更新</small></h1>
+    <a class="btn small" href="../" target="_blank" rel="noopener">サイトを見る ↗</a>
+    <button class="btn small" id="logout" hidden>この端末のカギを消す</button>
+  </div>
+  <nav class="tabs" id="tabs" hidden>
+    <button data-tab="news" class="on">お知らせ</button>
+    <button data-tab="classes">授業</button>
+    <button data-tab="teachers">先生</button>
+    <button data-tab="videos">動画</button>
+  </nav>
+</header>
+
+<main id="app"></main>
+<div class="actions" id="actions" hidden><div class="in" id="actionsIn"></div></div>
+
+<script>
+/* ─────────────────────────────────────────────
+   サイエンス里山ラボ宗像 管理画面
+   - GitHub のリポジトリ（tani0920/sciencemunakata-web）の data/*.json と画像を、
+     GitHub API で直接書き換える。保存すると1〜2分で GitHub Pages に反映される。
+   - カギ（GitHub の fine-grained personal access token：このリポジトリの Contents 読み書きだけ）は
+     この端末のブラウザ（localStorage）にだけ保存する。
+   ───────────────────────────────────────────── */
+const OWNER = 'tani0920', REPO = 'sciencemunakata-web', BRANCH = 'main';
+const API = `https://api.github.com/repos/${OWNER}/${REPO}`;
+const KEY = 'satoyama-admin-token';
+const FILES = { news: 'data/news.json', classes: 'data/classes.json', teachers: 'data/teachers.json', videos: 'data/videos.json' };
+const CATS = ['いきもの', 'しょくぶつ', 'かがく', 'でんき', 'おと・ひかり', 'からだ・ちから', '火・エネルギー', 'ものづくり', 'アート', 'ロボット・AI'];
+const NEWS_CATS = ['お知らせ', '授業', 'イベント', '料金'];
+
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
+let token = store.get(KEY) || '';
+let data = {};          // 読み込んだJSON
+let tab = 'news';
+let pending = [];       // 保存待ちの画像 [{path, blob, url}]
+
+function toast(msg, ng) {
+  const t = document.createElement('div'); t.className = 'toast' + (ng ? ' ng' : ''); t.textContent = msg;
+  document.body.appendChild(t); setTimeout(() => t.remove(), ng ? 7000 : 3500);
+}
+function busy(msg) {
+  let b = $('#busy');
+  if (!msg) { b && b.remove(); return; }
+  if (!b) { b = document.createElement('div'); b.id = 'busy'; b.className = 'busy'; document.body.appendChild(b); }
+  b.textContent = msg;
+}
+
+/* ───── GitHub API ───── */
+async function gh(path, opt = {}) {
+  const r = await fetch(API + path, {
+    ...opt,
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', ...(opt.body ? { 'Content-Type': 'application/json' } : {}) },
+    cache: 'no-store',
+  });
+  if (!r.ok) {
+    const t = await r.text();
+    const e = new Error(r.status === 401 ? 'カギが正しくないか、期限が切れています' : r.status === 403 || r.status === 404 ? 'カギにこのリポジトリを書き換える権限がありません' : `GitHub エラー ${r.status}`);
+    e.status = r.status; e.detail = t.slice(0, 300); throw e;
+  }
+  return r.status === 204 ? null : r.json();
+}
+const b64ToText = b => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\n/g, '')), c => c.charCodeAt(0)));
+function bytesToB64(bytes) {
+  let s = ''; const CH = 0x8000;
+  for (let i = 0; i < bytes.length; i += CH) s += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+  return btoa(s);
+}
+const textToB64 = t => bytesToB64(new TextEncoder().encode(t));
+const blobToB64 = async b => bytesToB64(new Uint8Array(await b.arrayBuffer()));
+
+async function loadJSON(name) {
+  const f = await gh(`/contents/${FILES[name]}?ref=${BRANCH}`);
+  return JSON.parse(b64ToText(f.content));
+}
+async function loadAll() {
+  const names = Object.keys(FILES);
+  const got = await Promise.all(names.map(loadJSON));
+  names.forEach((n, i) => data[n] = got[i]);
+}
+
+// 画像とJSONをまとめて1回の保存（コミット）にする
+async function commit(files, message) {
+  const ref = await gh(`/git/ref/heads/${BRANCH}`);
+  const base = ref.object.sha;
+  const baseCommit = await gh(`/git/commits/${base}`);
+  const tree = [];
+  for (const f of files) {
+    const blob = await gh('/git/blobs', { method: 'POST', body: JSON.stringify({ content: f.b64, encoding: 'base64' }) });
+    tree.push({ path: f.path, mode: '100644', type: 'blob', sha: blob.sha });
+  }
+  const t = await gh('/git/trees', { method: 'POST', body: JSON.stringify({ base_tree: baseCommit.tree.sha, tree }) });
+  const c = await gh('/git/commits', { method: 'POST', body: JSON.stringify({ message, tree: t.sha, parents: [base] }) });
+  await gh(`/git/refs/heads/${BRANCH}`, { method: 'PATCH', body: JSON.stringify({ sha: c.sha }) });
+}
+
+// 保存：最新のJSONを読み直してから、その上に今回の変更（追加・書き換え・削除）を当てる
+async function save(name, change, message) {
+  busy('保存しています…');
+  try {
+    const fresh = await loadJSON(name);
+    const next = change(fresh);
+    const files = [];
+    for (const p of pending) files.push({ path: p.path, b64: await blobToB64(p.blob) });
+    files.push({ path: FILES[name], b64: textToB64(JSON.stringify(next, null, 2) + '\n') });
+    await commit(files, message);
+    data[name] = next; pending = [];
+    busy();
+    toast('保存しました。1〜2分でサイトに反映されます。');
+    render();
+  } catch (e) {
+    busy(); console.error(e, e.detail);
+    toast('保存できませんでした：' + e.message, true);
+  }
+}
+
+/* ───── 画像：端末の中で縮小して WebP（だめなら JPEG）にする ───── */
+async function makeImage(file, opt) {
+  const bmp = await createImageBitmap(file);
+  let sw = bmp.width, sh = bmp.height, sx = 0, sy = 0, W, H;
+  if (opt.w && opt.h) {               // 決まった大きさに切り抜く（中央）
+    W = opt.w; H = opt.h;
+    const s = Math.max(W / sw, H / sh);
+    const cw = W / s, ch = H / s; sx = (sw - cw) / 2; sy = (sh - ch) / 2; sw = cw; sh = ch;
+  } else {                            // 縦横比はそのまま、長い辺を max に
+    const s = Math.min(1, opt.max / Math.max(sw, sh));
+    W = Math.round(sw * s); H = Math.round(sh * s);
+  }
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const cx = cv.getContext('2d'); cx.imageSmoothingQuality = 'high';
+  cx.drawImage(bmp, sx, sy, sw, sh, 0, 0, W, H);
+  let blob = await new Promise(r => cv.toBlob(r, 'image/webp', 0.85));
+  let ext = 'webp';
+  if (!blob || blob.type !== 'image/webp') { blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.85)); ext = 'jpg'; }
+  return { blob, ext };
+}
+const stamp = () => Date.now().toString(36);
+async function addImage(file, dir, base, opt) {
+  const { blob, ext } = await makeImage(file, opt);
+  const path = `assets/img/${dir}/${base}-${stamp()}.${ext}`;
+  const url = URL.createObjectURL(blob);
+  pending.push({ path, blob, url });
+  return path;
+}
+// 画面に出すときは、まだ保存していない画像は手元のデータを使う
+const src = p => { const n = pending.find(x => x.path === p); return n ? n.url : '../' + p; };
+
+/* ───── 小物 ───── */
+const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const WD = '日月火水木金土';
+const fmt = s => { if (!s) return ''; const d = new Date(s + 'T00:00:00'); return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日（${WD[d.getDay()]}）`; };
+function ytId(s) {
+  s = String(s || '').trim();
+  const m = s.match(/(?:youtu\.be\/|v=|\/shorts\/|\/embed\/|\/live\/)([\w-]{11})/);
+  return m ? m[1] : (/^[\w-]{11}$/.test(s) ? s : '');
+}
+const isShortUrl = s => /\/shorts\//.test(s || '');
+function uniqueId(base, list) {
+  let id = base, n = 2;
+  while (list.some(x => x.id === id)) id = `${base}-${n++}`;
+  return id;
+}
+const lines = s => String(s || '').split('\n').map(x => x.trim()).filter(Boolean);
+function actions(html) {
+  const a = $('#actions');
+  if (!html) { a.hidden = true; return; }
+  $('#actionsIn').innerHTML = html; a.hidden = false;
+}
+function confirmLeave() {
+  if (!pending.length && !document.querySelector('[data-dirty="1"]')) return true;
+  return confirm('保存していない変更があります。破棄しますか？');
+}
+
+/* ───── カギの登録 ───── */
+function renderSetup(msg) {
+  $('#tabs').hidden = true; $('#logout').hidden = true; actions();
+  $('#app').innerHTML = `<div class="card setup">
+    <h2 style="margin-top:0">はじめに：この端末にカギを登録</h2>
+    ${msg ? `<p class="err">${esc(msg)}</p>` : ''}
+    <p>サイトを書き換えるための「カギ」（GitHubのトークン）を入れてください。カギはこの端末のブラウザにだけ保存されます。</p>
+    <label class="f">カギ（github_pat_ で始まる文字）</label>
+    <input type="password" id="tk" autocomplete="off" placeholder="github_pat_…">
+    <p style="margin-top:14px"><button class="btn main" id="tkSave">登録する</button></p>
+    <details style="margin-top:18px"><summary><b>カギの作り方（はじめの1回だけ）</b></summary>
+      <ol>
+        <li>GitHub にログインして <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">新しいトークンの作成ページ</a> を開く</li>
+        <li>Token name：<code>里山ラボ管理画面</code>（なんでもOK）／Expiration：1年など</li>
+        <li>Repository access：<b>Only select repositories</b> → <code>${OWNER}/${REPO}</code> だけを選ぶ</li>
+        <li>Permissions → Repository permissions → <b>Contents</b> を <b>Read and write</b> に</li>
+        <li>いちばん下の「Generate token」→ 出てきた文字をコピーして、上の欄に貼る</li>
+      </ol>
+      <p class="hint">スマホとパソコンなど、使う端末ごとに1回ずつ登録します（同じカギを使いまわしてOK）。期限が切れたら、同じ手順で作り直してください。</p>
+    </details>
+  </div>`;
+  $('#tkSave').onclick = async () => {
+    token = $('#tk').value.trim();
+    if (!token) return;
+    busy('確認しています…');
+    try {
+      const r = await gh('');
+      if (!r.permissions || !r.permissions.push) throw new Error('このカギには書き込みの権限がありません（Contents を Read and write に）');
+      store.set(KEY, token);
+      await start();
+    } catch (e) { token = ''; busy(); renderSetup(e.message); }
+  };
+}
+
+async function start() {
+  busy('読み込んでいます…');
+  try { await loadAll(); }
+  catch (e) { busy(); if (e.status === 401) { store.del(KEY); token = ''; } renderSetup(e.message); return; }
+  busy();
+  $('#tabs').hidden = false; $('#logout').hidden = false;
+  render();
+}
+
+/* ───── 一覧 ───── */
+function render() {
+  $$('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  actions(); pending.forEach(p => URL.revokeObjectURL(p.url)); pending = [];
+  ({ news: listNews, classes: listClasses, teachers: listTeachers, videos: listVideos })[tab]();
+  window.scrollTo(0, 0);
+}
+function listNews() {
+  const list = [...data.news].sort((a, b) => b.date.localeCompare(a.date));
+  $('#app').innerHTML = `<div class="card"><div class="head"><h2>お知らせ（${list.length}件）</h2><button class="btn main" id="add">＋ お知らせを書く</button></div>
+    <p class="hint">トップには新しい3件、「お知らせ」ページにぜんぶ出ます。</p>
+    <ul class="list">${list.map(n => `<li>${n.images?.[0] ? `<img src="${esc(src(n.images[0]))}" alt="">` : '<img alt="">'}
+      <div class="t"><b>${esc(n.title)}</b><small><span class="tag">${esc(n.category || '')}</span>${esc(fmt(n.date))}</small></div>
+      <button class="btn small" data-edit="${esc(n.id)}">編集</button></li>`).join('')}</ul></div>`;
+  $('#add').onclick = () => editNews(null);
+  $$('[data-edit]').forEach(b => b.onclick = () => editNews(b.dataset.edit));
+}
+function listClasses() {
+  const t = today();
+  const list = [...data.classes].sort((a, b) => b.date.localeCompare(a.date));
+  $('#app').innerHTML = `<div class="card"><div class="head"><h2>授業（${list.length}件）</h2><button class="btn main" id="add">＋ 授業を追加</button></div>
+    <p class="hint">日付が過ぎると、サイトでは自動で「これまでの授業」に移ります。</p>
+    <ul class="list">${list.map(c => `<li><img src="${esc(src(c.photo || c.eyecatch || ''))}" alt="" onerror="this.removeAttribute('src')">
+      <div class="t"><b>${esc(c.title)}</b><small>${c.status === '中止' ? '<span class="tag stop">中止</span>' : c.date < t ? '<span class="tag past">おわり</span>' : '<span class="tag">これから</span>'}${esc(fmt(c.date))}</small></div>
+      <button class="btn small" data-edit="${esc(c.id)}">編集</button></li>`).join('')}</ul></div>`;
+  $('#add').onclick = () => editClass(null);
+  $$('[data-edit]').forEach(b => b.onclick = () => editClass(b.dataset.edit));
+}
+function listTeachers() {
+  const list = data.teachers;
+  $('#app').innerHTML = `<div class="card"><div class="head"><h2>先生（${list.length}人）</h2><button class="btn main" id="add">＋ 先生を追加</button></div>
+    <ul class="list">${list.map(p => `<li><img src="${esc(src(p.photo || ''))}" alt="" style="width:48px;height:48px;border-radius:50%" onerror="this.removeAttribute('src')">
+      <div class="t"><b>${esc(p.name)} 先生</b><small>${esc((p.org || '').split('\n')[0])}</small></div>
+      <button class="btn small" data-edit="${esc(p.id)}">編集</button></li>`).join('')}</ul></div>`;
+  $('#add').onclick = () => editTeacher(null);
+  $$('[data-edit]').forEach(b => b.onclick = () => editTeacher(b.dataset.edit));
+}
+function listVideos() {
+  const list = data.videos;
+  $('#app').innerHTML = `<div class="card"><div class="head"><h2>動画（授業以外）${list.length}本</h2><button class="btn main" id="add">＋ 動画を追加</button></div>
+    <p class="hint">授業の動画は「授業」の各授業に入れます。ここは授業以外（里山の季節など）の動画です。</p>
+    <ul class="list">${list.map(v => `<li><img src="https://i.ytimg.com/vi/${esc(v.id)}/mqdefault.jpg" alt="">
+      <div class="t"><b>${esc(v.title)}</b><small>${v.short ? '<span class="tag">ショート</span>' : ''}${esc(v.id)}</small></div>
+      <button class="btn small" data-edit="${esc(v.id)}">編集</button></li>`).join('')}</ul></div>`;
+  $('#add').onclick = () => editVideo(null);
+  $$('[data-edit]').forEach(b => b.onclick = () => editVideo(b.dataset.edit));
+}
+
+/* ───── 共通：画像の欄 ───── */
+// one: 1枚だけ / many: 何枚でも。cls: 'tall' 'sq' など見本の形
+function imgField(el, { paths, many, dir, base, opt, cls = '' }) {
+  let list = [...(paths || [])];
+  const draw = () => {
+    el.innerHTML = `<div class="imgs">${list.map((p, i) => `<figure><img class="${cls} ${pending.some(x => x.path === p) ? 'new' : ''}" src="${esc(src(p))}" alt=""><button type="button" data-rm="${i}" title="外す">×</button></figure>`).join('')}</div>
+      <p style="margin:8px 0 0"><label class="pick">📷 ${list.length && !many ? '写真を差し替える' : '写真を選ぶ'}<input type="file" accept="image/*" ${many ? 'multiple' : ''}></label></p>`;
+    $$('[data-rm]', el).forEach(b => b.onclick = () => { list.splice(+b.dataset.rm, 1); el.dataset.dirty = '1'; draw(); });
+    $('input', el).onchange = async e => {
+      const files = [...e.target.files]; if (!files.length) return;
+      busy('写真を整えています…');
+      try {
+        for (const f of files) { const p = await addImage(f, dir(), base(), opt); if (many) list.push(p); else list = [p]; }
+      } catch (err) { toast('写真を読み込めませんでした（' + err.message + '）', true); }
+      busy(); el.dataset.dirty = '1'; draw();
+    };
+  };
+  draw();
+  return () => list;
+}
+function linksField(el, links) {
+  let list = (links || []).map(l => ({ ...l }));
+  const draw = () => {
+    el.innerHTML = `<div class="links-ed">${list.map((l, i) => `<div class="lr"><input type="text" data-k="label" data-i="${i}" value="${esc(l.label)}" placeholder="リンクの文字"><input type="url" data-k="url" data-i="${i}" value="${esc(l.url)}" placeholder="https://…"><button type="button" class="btn small danger" data-rm="${i}">×</button></div>`).join('')}</div>
+      <button type="button" class="btn small" data-add>＋ リンクを足す</button>`;
+    $$('input', el).forEach(inp => inp.oninput = () => { list[+inp.dataset.i][inp.dataset.k] = inp.value; el.dataset.dirty = '1'; });
+    $$('[data-rm]', el).forEach(b => b.onclick = () => { list.splice(+b.dataset.rm, 1); draw(); });
+    $('[data-add]', el).onclick = () => { list.push({ label: '', url: '' }); draw(); };
+  };
+  draw();
+  return () => list.filter(l => l.url.trim()).map(l => ({ label: l.label.trim() || l.url.trim(), url: l.url.trim() }));
+}
+function formActions(onSave, onDelete) {
+  actions(`<button class="btn" id="back">← 一覧にもどる</button><span class="sp"></span>${onDelete ? '<button class="btn danger" id="del">削除</button>' : ''}<button class="btn blue" id="save">保存してサイトに出す</button>`);
+  $('#back').onclick = () => { if (confirmLeave()) render(); };
+  $('#save').onclick = onSave;
+  if (onDelete) $('#del').onclick = onDelete;
+  $$('#app input, #app textarea, #app select').forEach(i => i.addEventListener('input', () => { $('#app').dataset.dirty = '1'; }));
+}
+const val = id => ($('#' + id)?.value || '').trim();
+
+/* ───── お知らせ ───── */
+function editNews(id) {
+  const n = id ? data.news.find(x => x.id === id) : { date: today(), category: 'お知らせ', title: '', body: '', images: [], links: [] };
+  const cats = [...new Set([...NEWS_CATS, ...data.news.map(x => x.category).filter(Boolean)])];
+  const nid = id || `${today()}-${stamp()}`;   // 新しいお知らせのID（写真の名前にも使う）
+  const newsId = () => nid;
+  $('#app').innerHTML = `<div class="card"><h2 style="margin-top:0">${id ? 'お知らせを編集' : '新しいお知らせ'}</h2>
+    <div class="row"><div><label class="f">日付</label><input type="date" id="date" value="${esc(n.date)}"></div>
+      <div><label class="f">種類</label><select id="cat">${cats.map(c => `<option${c === n.category ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select></div></div>
+    <label class="f">タイトル</label><input type="text" id="title" value="${esc(n.title)}">
+    <label class="f">本文<small>空行で段落が分かれます</small></label><textarea id="body" rows="10">${esc(n.body)}</textarea>
+    <label class="f">写真<small>何枚でも。横長がきれいに出ます</small></label><div id="imgs"></div>
+    <label class="f">リンク<small>チラシのPDFや申込みページなど</small></label><div id="links"></div></div>`;
+  const getImgs = imgField($('#imgs'), { paths: n.images, many: true, dir: () => 'news', base: () => newsId(), opt: { max: 1400 } });
+  const getLinks = linksField($('#links'), n.links);
+  formActions(() => {
+    if (!val('title')) return toast('タイトルを入れてください', true);
+    if (!val('date')) return toast('日付を入れてください', true);
+    const item = { id: newsId(), date: val('date'), category: val('cat'), title: val('title'), body: $('#body').value.replace(/\s+$/, ''), images: getImgs(), links: getLinks() };
+    save('news', list => id ? list.map(x => x.id === id ? { ...x, ...item } : x) : [item, ...list], `お知らせ：${item.title}`);
+  }, id && (() => { if (confirm(`「${n.title}」を削除します。よろしいですか？`)) save('news', list => list.filter(x => x.id !== id), `お知らせを削除：${n.title}`); }));
+}
+
+/* ───── 授業 ───── */
+function editClass(id) {
+  const c = id ? data.classes.find(x => x.id === id) : { date: '', reception: '13:15', start: '13:30', end: '15:00', title: '', subtitle: '', teacher: '', category: CATS[0], status: '', description: '', notes: [], videoId: '', photo: '', eyecatch: '', photoType: 'illust', gallery: [] };
+  const cats = [...new Set([...CATS, ...data.classes.map(x => x.category)])];
+  $('#app').innerHTML = `<div class="card"><h2 style="margin-top:0">${id ? '授業を編集' : '新しい授業'}</h2>
+    <div class="row"><div><label class="f">日付</label><input type="date" id="date" value="${esc(c.date)}"></div>
+      <div><label class="f">受付</label><input type="text" id="reception" value="${esc(c.reception)}" placeholder="13:15"></div>
+      <div><label class="f">はじまり</label><input type="text" id="start" value="${esc(c.start)}" placeholder="13:30"></div>
+      <div><label class="f">おわり</label><input type="text" id="end" value="${esc(c.end)}" placeholder="15:00"></div></div>
+    <label class="f">タイトル</label><input type="text" id="title" value="${esc(c.title)}">
+    <label class="f">サブタイトル<small>なければ空でOK</small></label><input type="text" id="subtitle" value="${esc(c.subtitle)}">
+    <div class="row"><div><label class="f">先生</label><select id="teacher"><option value="">（一覧にいない・なし）</option>${data.teachers.map(t => `<option value="${esc(t.id)}"${t.id === c.teacher ? ' selected' : ''}>${esc(t.name)}（${esc((t.org || '').split('\n')[0])}）</option>`).join('')}</select></div>
+      <div><label class="f">ジャンル</label><select id="cat">${cats.map(x => `<option${x === c.category ? ' selected' : ''}>${esc(x)}</option>`).join('')}</select></div></div>
+    <label class="f">先生（一覧にいないとき）<small>そのまま表示されます</small></label><input type="text" id="teacherText" value="${esc(c.teacherText || '')}" placeholder="例：〇〇大学 〇〇 先生">
+    <label class="f">授業の内容</label><textarea id="description" rows="6">${esc(c.description)}</textarea>
+    <label class="f">注意・持ち物など<small>1行に1つ</small></label><textarea id="notes" rows="4">${esc((c.notes || []).join('\n'))}</textarea>
+    <label class="check"><input type="checkbox" id="stop"${c.status === '中止' ? ' checked' : ''}> 中止になった（サイトに「中止になりました」と出ます）</label>
+    <h3 style="margin:26px 0 0;font-size:16px">写真</h3>
+    <label class="f">告知画像（アイキャッチ）<small>Instagram・LINEで使った縦長の画像（4:5）</small></label><div id="eye"></div>
+    <label class="f">表紙の写真<small>横長 4:3 に切り抜きます。授業のあとに当日の写真へ差し替えると◎</small></label><div id="photo"></div>
+    <label class="check"><input type="checkbox" id="real"${c.photoType === 'photo' ? ' checked' : ''}> 表紙は当日の写真（チェックなし＝告知用イラスト。「イメージ」と小さく表示）</label>
+    <label class="f">授業のようす<small>詳細画面に出す写真。何枚でも</small></label><div id="gallery"></div>
+    <h3 style="margin:26px 0 0;font-size:16px">動画</h3>
+    <label class="f">YouTube のアドレス<small>ダイジェスト動画ができたら貼る。限定公開の道順動画は入れない</small></label>
+    <input type="text" id="video" value="${esc(c.videoId ? 'https://youtu.be/' + c.videoId : '')}" placeholder="https://youtu.be/… または https://youtube.com/shorts/…">
+    <label class="check"><input type="checkbox" id="short"${c.videoShort ? ' checked' : ''}> ショート動画（縦長）</label></div>`;
+  const cid = () => id || uniqueId(val('date') || today(), data.classes);
+  const getEye = imgField($('#eye'), { paths: c.eyecatch ? [c.eyecatch] : [], dir: () => 'classes', base: () => cid() + '-eye', opt: { w: 640, h: 800 }, cls: 'tall' });
+  const getPhoto = imgField($('#photo'), { paths: c.photo ? [c.photo] : [], dir: () => 'classes', base: cid, opt: { w: 800, h: 600 } });
+  const getGal = imgField($('#gallery'), { paths: c.gallery, many: true, dir: () => 'classes', base: () => cid() + '-g', opt: { max: 1200 } });
+  $('#video').addEventListener('input', () => { if (isShortUrl(val('video'))) $('#short').checked = true; });
+  formActions(() => {
+    if (!val('date')) return toast('日付を入れてください', true);
+    if (!val('title')) return toast('タイトルを入れてください', true);
+    const vid = ytId(val('video'));
+    if (val('video') && !vid) return toast('YouTube のアドレスが読めません', true);
+    const newId = cid();
+    const item = {
+      ...(id ? c : {}), id: newId, date: val('date'), reception: val('reception'), start: val('start'), end: val('end'),
+      title: val('title'), subtitle: val('subtitle'), teacher: val('teacher'), category: val('cat'),
+      status: $('#stop').checked ? '中止' : '', description: $('#description').value.trim(), notes: lines($('#notes').value),
+      videoId: vid, photo: getPhoto()[0] || '', eyecatch: getEye()[0] || '', photoType: $('#real').checked ? 'photo' : 'illust', gallery: getGal(),
+    };
+    if ($('#short').checked) item.videoShort = true; else delete item.videoShort;
+    if (val('teacherText') && !item.teacher) item.teacherText = val('teacherText'); else delete item.teacherText;
+    save('classes', list => id ? list.map(x => x.id === id ? item : x) : [item, ...list], `授業：${item.date} ${item.title}`);
+  }, id && (() => { if (confirm(`「${c.title}」を削除します。中止の授業は削除せず「中止になった」にチェックでもOKです。削除しますか？`)) save('classes', list => list.filter(x => x.id !== id), `授業を削除：${c.title}`); }));
+}
+
+/* ───── 先生 ───── */
+function editTeacher(id) {
+  const p = id ? data.teachers.find(x => x.id === id) : { id: '', name: '', org: '', field: '', photo: '', bio: '', links: [] };
+  $('#app').innerHTML = `<div class="card"><h2 style="margin-top:0">${id ? '先生を編集' : '新しい先生'}</h2>
+    ${id ? '' : `<label class="f">ID<small>半角英小文字（例：tanaka）。授業とつなぐための名前で、サイトには出ません</small></label><input type="text" id="tid" placeholder="tanaka" autocapitalize="off">`}
+    <label class="f">お名前<small>姓と名のあいだに空白</small></label><input type="text" id="name" value="${esc(p.name)}" placeholder="宗像 太郎">
+    <label class="f">所属<small>2行目以降は小さく出ます</small></label><textarea id="org" rows="2" style="min-height:0">${esc(p.org)}</textarea>
+    <label class="f">専門・得意なこと</label><input type="text" id="field" value="${esc(p.field)}" placeholder="植物・農業">
+    <label class="f">写真<small>正方形に切り抜きます</small></label><div id="photo"></div>
+    <label class="f">紹介文</label><textarea id="bio" rows="6">${esc(p.bio)}</textarea>
+    <label class="f">リンク<small>研究室のページなど</small></label><div id="links"></div></div>`;
+  const tid = () => id || val('tid').toLowerCase();
+  const getPhoto = imgField($('#photo'), { paths: p.photo ? [p.photo] : [], dir: () => 'teachers', base: () => tid() || 'teacher', opt: { w: 360, h: 360 }, cls: 'sq' });
+  const getLinks = linksField($('#links'), p.links);
+  formActions(() => {
+    if (!id && !/^[a-z][a-z0-9-]*$/.test(tid())) return toast('ID は半角英小文字で入れてください（例：tanaka）', true);
+    if (!id && data.teachers.some(x => x.id === tid())) return toast('そのIDはもう使われています', true);
+    if (!val('name')) return toast('お名前を入れてください', true);
+    const item = { ...(id ? p : {}), id: tid(), name: val('name'), org: $('#org').value.trim(), field: val('field'), photo: getPhoto()[0] || '', bio: $('#bio').value.trim(), links: getLinks() };
+    save('teachers', list => id ? list.map(x => x.id === id ? item : x) : [...list, item], `先生：${item.name}`);
+  }, id && (() => {
+    const used = data.classes.filter(c => c.teacher === id).length;
+    if (used) return toast(`この先生は ${used} 件の授業に入っているので削除できません`, true);
+    if (confirm(`${p.name} 先生を削除します。よろしいですか？`)) save('teachers', list => list.filter(x => x.id !== id), `先生を削除：${p.name}`);
+  }));
+}
+
+/* ───── 動画 ───── */
+function editVideo(id) {
+  const v = id ? data.videos.find(x => x.id === id) : { id: '', title: '', short: false };
+  $('#app').innerHTML = `<div class="card"><h2 style="margin-top:0">${id ? '動画を編集' : '新しい動画'}</h2>
+    <label class="f">YouTube のアドレス</label><input type="text" id="video" value="${esc(v.id ? 'https://youtu.be/' + v.id : '')}" placeholder="https://youtu.be/…">
+    <label class="f">タイトル</label><input type="text" id="title" value="${esc(v.title)}">
+    <label class="check"><input type="checkbox" id="short"${v.short ? ' checked' : ''}> ショート動画（縦長）</label></div>`;
+  $('#video').addEventListener('input', () => { if (isShortUrl(val('video'))) $('#short').checked = true; });
+  formActions(() => {
+    const vid = ytId(val('video'));
+    if (!vid) return toast('YouTube のアドレスを入れてください', true);
+    if (!val('title')) return toast('タイトルを入れてください', true);
+    const item = { id: vid, title: val('title'), short: $('#short').checked };
+    save('videos', list => id ? list.map(x => x.id === id ? item : x) : [item, ...list], `動画：${item.title}`);
+  }, id && (() => { if (confirm(`「${v.title}」を削除します。よろしいですか？`)) save('videos', list => list.filter(x => x.id !== id), `動画を削除：${v.title}`); }));
+}
+
+/* ───── はじまり ───── */
+$$('#tabs button').forEach(b => b.onclick = () => { if (b.dataset.tab === tab || confirmLeave()) { tab = b.dataset.tab; render(); } });
+$('#logout').onclick = () => { if (confirm('この端末に保存したカギを消します。次に使うときはカギをもう一度入れてください。')) { store.del(KEY); token = ''; renderSetup(); } };
+window.addEventListener('beforeunload', e => { if (pending.length) { e.preventDefault(); e.returnValue = ''; } });
+if (token) start(); else renderSetup();
+</script>
+</body>
+</html>
