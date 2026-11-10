@@ -1,0 +1,75 @@
+{
+ "lineUrl": "https://line.me/R/ti/p/@268rzaol",
+ "lineId": "@268rzaol",
+ "lineQr": "https://qr-official.line.me/sid/L/268rzaol.png",
+ "gaId": "",
+ "hero": [
+  {
+   "src": "assets/img/hero/1.webp?v=202611101040",
+   "alt": "青空の下に広がる里山の草地"
+  },
+  {
+   "src": "assets/img/hero/2.webp?v=20261110113629",
+   "alt": "里山の焚き火台で、自分でおこした火を育てる子ども"
+  },
+  {
+   "src": "assets/img/hero/3.webp?v=202611101040",
+   "alt": "葉っぱのスタンプの布が里山の空にはためく"
+  },
+  {
+   "src": "assets/img/hero/4.webp?v=202611101040",
+   "alt": "ロープで大穂の里山の木に登る子どもたち"
+  },
+  {
+   "src": "assets/img/hero/5.webp?v=20261110113629",
+   "alt": "みかんに刺した銅板をワニ口クリップでつなぐ、みかん電池の実験"
+  }
+ ],
+ "games": [
+  {
+   "title": "むなかた虫とり日記",
+   "desc": "夏休み さいごの14日間。宗像の田んぼや河原、大島をめぐって虫をつかまえ、図鑑を完成させよう！",
+   "url": "https://tani0920.github.io/mushitori-rpg/",
+   "status": "open",
+   "chara": "teal-4",
+   "image": "assets/img/games/mushitori.webp",
+   "page": "mushitori/"
+  },
+  {
+   "title": "むなかた虫そだて日記",
+   "desc": "つかまえた虫を、1週間おせわしてそだててみよう。",
+   "url": "",
+   "status": "soon",
+   "chara": "pink-5",
+   "image": "assets/img/games/mushisodate.webp"
+  },
+  {
+   "title": "里山ラボ サイエンスアプリ",
+   "desc": "授業でやった科学のふしぎを、ミニゲームでもう一度。1つはだれでもおためしできるよ。",
+   "badge": "会員限定",
+   "url": "",
+   "status": "soon",
+   "chara": "blue-3"
+  }
+ ],
+ "sns": [
+  {
+   "id": "instagram",
+   "label": "Instagram",
+   "url": "https://www.instagram.com/sciencemunakata/",
+   "note": "授業のようすを毎回発信中"
+  },
+  {
+   "id": "youtube",
+   "label": "YouTube",
+   "url": "https://www.youtube.com/@sciencesatoyamalab",
+   "note": "授業のダイジェスト動画"
+  },
+  {
+   "id": "tiktok",
+   "label": "TikTok",
+   "url": "",
+   "note": "はじめたらURLを入れると表示されます"
+  }
+ ]
+}

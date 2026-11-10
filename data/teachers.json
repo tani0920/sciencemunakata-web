@@ -1,0 +1,142 @@
+[
+  {
+    "id": "hirao",
+    "name": "平尾 健二",
+    "org": "福岡教育大学 教育学部\n技術教育研究ユニット",
+    "field": "植物・農業",
+    "photo": "assets/img/teachers/hirao.webp",
+    "bio": "教育学部で農業技術に関する教育研究を行なっています。得意分野は、作物の栽培技術、作物の光合成能力や食料としてのエネルギー生産ですが、食育にも力を入れています。",
+    "links": []
+  },
+  {
+    "id": "matsuoka",
+    "name": "松岡 雅忠",
+    "org": "福岡大学 理学部 化学科",
+    "field": "化学",
+    "photo": "assets/img/teachers/matsuoka.webp",
+    "bio": "中学校，高校の教員を21年間勤めたのち、2020年に福岡に来ました。現在は、学校の先生を目指している学生さんと、一緒に勉強・研究しています。自然の中で、いろいろな実験を楽しみましょう！",
+    "links": []
+  },
+  {
+    "id": "hayashi",
+    "name": "林 壮一",
+    "org": "福岡大学 理学部\n物理科学科",
+    "field": "物理",
+    "photo": "assets/img/teachers/hayashi.webp",
+    "bio": "専門は，物理教育や科学教育，サイエンス・コミュニケーションなど，他者に科学の楽しさや面白さ，不思議さを伝えること。研究室の学生や大学院生，学校の先生方や科学館の方たちと協力して，科学ファンや物理ファンを増やすための工夫や活動を行っている。近い将来，皆さんの中から科学を研究する方が現れることを楽しみにしています。",
+    "links": []
+  },
+  {
+    "id": "takishita",
+    "name": "瀧下 清貴",
+    "org": "福岡女子大学 国際文理学部\n環境科学科",
+    "field": "微生物",
+    "photo": "assets/img/teachers/takishita.webp",
+    "bio": "環境中には目に見えない生物（微生物）がたくさん存在しています。微生物は我々には見えませんが、生態系を維持するために重要な役割を持っています。私は、主に海を対象として微生物の研究を行っています。",
+    "links": []
+  },
+  {
+    "id": "matsuo",
+    "name": "松尾 亮太",
+    "org": "福岡女子大学 国際文理学部\n環境科学科",
+    "field": "神経科学",
+    "photo": "assets/img/teachers/matsuo.webp",
+    "bio": "学生時代はラットの脳を対象として記憶の分子機構を研究してきました。その後、実験対象をナメクジに変え、匂い学習の神経機構や神経細胞のDNA倍数化、脳での光感知など、多岐にわたる神経科学研究を展開しています。",
+    "links": []
+  },
+  {
+    "id": "kitahara",
+    "name": "北原 佳明",
+    "org": "森遊び工房 notameni\n代表",
+    "field": "自然あそび",
+    "photo": "assets/img/teachers/kitahara.webp",
+    "bio": "「豊かな遊びをした子どもが豊かな社会をつくる」を信条に里山エリアで自然体験活動や冒険遊び場作りを行っています。遊びの達人として「森のようちえん」や「プレーパーク」を月1回開催中！JBS認定ブッシュクラフトインストラクター。",
+    "links": [
+      {
+        "label": "Facebook",
+        "url": "https://www.facebook.com/share/LfNmeyzu48Faw9mq/"
+      },
+      {
+        "label": "Instagram",
+        "url": "https://www.instagram.com/moriasobikoubou_notameni"
+      },
+      {
+        "label": "Instagram（森のようちえん）",
+        "url": "https://www.instagram.com/morinoyouchien_nakano"
+      }
+    ]
+  },
+  {
+    "id": "adachi",
+    "name": "足立 憲正",
+    "org": "ロボット・プログラミング教室\nJ-SPACE 代表",
+    "field": "ロボット・AI",
+    "photo": "assets/img/teachers/adachi.webp",
+    "bio": "自動車・ロボットメーカーを経て、今は子どもたちにAIやロボットを教えています。子どもたちのワクワクを大切に、人と地球と共にあるロボットを創る、志ある未来のエンジニアを育てています。",
+    "links": [
+      {
+        "label": "Instagram",
+        "url": "https://www.instagram.com/j_space_robot/"
+      }
+    ]
+  },
+  {
+    "id": "kitamikado",
+    "name": "北御門 雄大",
+    "org": "福岡教育大学 教育学部\n技術教育研究ユニット",
+    "field": "金属・ものづくり",
+    "photo": "assets/img/teachers/kitamikado.webp",
+    "bio": "金属を目に見えないほど小さいレベルで加工する研究や，金属の元素を混ぜてコーティングをつくる研究をしています。これらの技術は「表面処理」と呼ばれていて，表面処理により金属に特別な性質を与えることができます。",
+    "links": []
+  },
+  {
+    "id": "abe",
+    "name": "安倍 智子",
+    "org": "あべ農園はこべのうた 代表\n農民芸術家、幼稚園・福岡教育大学非常勤講師",
+    "field": "アート・農",
+    "photo": "assets/img/teachers/abe.webp",
+    "bio": "「めぐるいのち」をコンセプトに、農業や芸術活動を行っています。自然って、不思議で面白くて、とっても興味深い！作品作りを通して、自然と人のつながりを大切にしていきたいなぁと思っています。",
+    "links": [
+      {
+        "label": "Instagram",
+        "url": "https://www.instagram.com/abetomo_work/"
+      },
+      {
+        "label": "Facebook",
+        "url": "https://www.facebook.com/tomoko.abe.3367"
+      }
+    ]
+  },
+  {
+    "id": "shindo",
+    "name": "進藤 明範／美菜",
+    "org": "松本造園 代表／総務",
+    "field": "ツリークライミング",
+    "photo": "assets/img/teachers/shindo.webp",
+    "bio": "宗像市で庭木や大木の手入れを生業としています。最近は、手入れが遅れて大きくなってしまった樹木が増えてきました。そんな樹木のお手入れにロープを使ったクライミング技術が求められるようになりました。今回は皆で楽しく樹上の景色を楽しみましょう。Tree Master Climbing Academyインストラクター。",
+    "links": [
+      {
+        "label": "Facebook",
+        "url": "https://www.facebook.com/profile.php?id=100057287205870"
+      }
+    ]
+  },
+  {
+    "id": "mushimezuru",
+    "name": "岸本×太・成本（なるむし）",
+    "org": "蟲愛會（むしめづるかい）",
+    "field": "昆虫・自然観察",
+    "photo": "assets/img/teachers/mushimezuru.webp",
+    "bio": "関西から福岡に移り住み、むしのかわいらしさを伝える自然観察会を二人で続けています。岸本さんは自然観察指導員で、筑豊のむしはかせ。筑豊から北九州まで、むしだけでなく植物・鳥・きのこ・石・化石など、自然の楽しさを伝えています。",
+    "links": [
+      {
+        "label": "Instagram（なるむし）",
+        "url": "https://www.instagram.com/nyarumusi/"
+      },
+      {
+        "label": "Instagram（岸本）",
+        "url": "https://www.instagram.com/chikuzenraku/"
+      }
+    ]
+  }
+]

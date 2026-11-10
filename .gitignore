@@ -1,0 +1,4 @@
+.DS_Store
+# 元の絵・差し替え前の写真（公開しない）
+_tools/src/
+__pycache__/
