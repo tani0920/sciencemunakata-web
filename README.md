@@ -62,8 +62,15 @@ SNS：`site.json` の `sns`。URLが空のものは表示しない（TikTokを�
 
 - [x] 更新用の管理画面（`/admin/`）
 - [x] GitHub Pages に公開（仮のアドレス）
-- [ ] ドメイン切り替え → ムームードメインで sciencemunakata.tech を切り替え（Google のメール設定 MX・SPF・確認TXT・DMARC を残す）
+- [x] ドメイン切り替え（2026-11-10。ネームサーバーを Wix → ムームーDNS。下の「DNS」） → ムームードメインで sciencemunakata.tech を切り替え（Google のメール設定 MX・SPF・確認TXT・DMARC を残す）
 - [ ] 里山ラボ サイエンスアプリ（会員コード・1つおためし）
+
+## DNS（2026-11-10 に Wix からムームーDNSへ移した）
+- ドメインの契約：ムームードメイン。ネームサーバー：ムームーDNS（dns01/dns02.muumuu-domain.com）。設定は「ムームーDNS → 変更 → カスタム設定 → 設定2」。
+- 入っているレコード：A ×4（185.199.108〜111.153＝GitHub Pages）／CNAME www → tani0920.github.io／MX ×5（aspmx.l.google.com 10、alt1〜alt4 20〜50）／TXT SPF `v=spf1 include:_spf.google.com ~all`／TXT google-site-verification／TXT _dmarc `v=DMARC1; p=none`
+- Wix のメルマガ用（s1・s2・sel1._domainkey、sg）は移していない（Wix のメール配信は使わない）。
+- **メール（Google Workspace）は Wix 経由の契約（年払い、次回 2027-08-11）。Wix のプレミアムプランを止めても、こちらは解約しない。**
+- GitHub Pages の独自ドメイン：www.sciencemunakata.tech（リポジトリの `CNAME` ファイル）。
 
 ## 公開するときにいっしょにやること（Google アナリティクス／サーチコンソール）
 
