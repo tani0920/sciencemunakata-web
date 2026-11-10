@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>ページが見つかりません｜サイエンス里山ラボ宗像</title>
+<link rel="icon" href="/assets/img/favicon.png">
+<script>
+/* Wix のころのアドレスで来た人を、新しいサイトの同じ内容へ案内する（GitHub Pages はサーバー側の転送ができないため） */
+(function () {
+  var p = decodeURIComponent(location.pathname).replace(/\/+$/, '');
+  var news = [
+    ['むなかたpay', '2025-06-25-munakatapay'], ['グローバルアリーナ', '2025-02-17-bousai-daycamp'],
+    ['会員料金', '2025-04-07-ryokin'], ['単体授業', '2025-02-16-tantai'], ['福岡女子大学', '2025-06-26-fwu']
+  ];
+  var to = null;
+  if (/^\/(post|ozhi-rase-2)\//i.test(p)) {
+    to = '/news/';
+    for (var i = 0; i < news.length; i++) if (p.toLowerCase().indexOf(news[i][0].toLowerCase()) >= 0) { to = '/news/#n-' + news[i][1]; break; }
+  } else if (/^\/(blog|ozhi-rase-2|news)(\/|$)/i.test(p)) to = '/news/';
+  else if (/^\/(challenges|classes|lesson)/i.test(p)) to = '/#classes';
+  else if (/^\/(about|company|profile)/i.test(p)) to = '/daihyo/';
+  else if (/^\/(contact|join|price)/i.test(p)) to = '/#join';
+  if (to) location.replace(to);
+})();
+</script>
+<style>
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #FFFBF1; color: #26314D;
+    font: 16px/1.8 "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif; text-align: center; padding: 24px; box-sizing: border-box; }
+  img.chara { width: 140px; height: auto; }
+  h1 { font-size: 22px; margin: 12px 0 6px; }
+  p { margin: 0 0 22px; color: #56607A; }
+  a.btn { display: inline-block; margin: 4px; padding: 10px 22px; border: 3px solid #26314D; border-radius: 999px; background: #FFC53D; color: #26314D; font-weight: bold; text-decoration: none; box-shadow: 0 4px 0 #26314D; }
+  a.btn.sub { background: #fff; }
+</style>
+</head>
+<body>
+  <main>
+    <img class="chara" src="/assets/img/chara/blue-3.webp" alt="">
+    <h1>ページが見つかりませんでした</h1>
+    <p>サイトをリニューアルしたため、ページのアドレスが変わっています。</p>
+    <a class="btn" href="/">トップページへ</a>
+    <a class="btn sub" href="/#classes">授業の一覧</a>
+    <a class="btn sub" href="/news/">お知らせ</a>
+  </main>
+</body>
+</html>

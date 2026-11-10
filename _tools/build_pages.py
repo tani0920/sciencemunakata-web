@@ -130,7 +130,7 @@ def write(slug, html):
 
 # ───────── 代表あいさつ ─────────
 ACTS = [
-    ('forenta 宗像エリア', '管理者', 'https://www.forenta.net/munakata'),
+    ('forenta 宗像エリア', '管理者', 'https://www.forenta.net/area-2/munakata'),
     ('むなかた自然栽培推進会', 'プロデュース支援', 'https://www.munakatasss.net/'),
     ('宗像大島 一日一組限定離島宿 minawa', 'プロデュース', 'http://minawa.jp/'),
     ('むなかたシェアラボ', '管理人', 'http://munakatasharelab.com/'),
