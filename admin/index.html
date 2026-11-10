@@ -58,6 +58,14 @@
   .imgs .new { outline: 3px solid var(--sun); outline-offset: 1px; border-radius: 8px; }
   .pick { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border: 2px dashed var(--blue); border-radius: 10px; color: var(--blue); font-weight: bold; cursor: pointer; background: var(--blue-l); }
   .pick input { display: none; }
+  .drop { border: 2px dashed transparent; border-radius: 12px; padding: 4px; margin: -4px; transition: background .15s, border-color .15s; }
+  .drop.over { border-color: var(--blue); background: var(--blue-l); }
+  .drophint { margin-left: 10px; font-size: 13px; color: var(--ink-2); }
+  @media (hover: none) { .drophint { display: none; } }
+  .pub { position: sticky; top: 0; z-index: 4; max-width: 880px; margin: 12px auto 0; padding: 10px 16px; border: 2px solid var(--ink); border-radius: 12px; background: var(--sun-l); }
+  .pub.ok { background: var(--leaf-l); }
+  .pub.slow { background: #fff; }
+  .pub a { color: var(--blue); font-weight: bold; }
   .links-ed .lr { display: grid; grid-template-columns: 1fr 1.4fr auto; gap: 6px; margin-bottom: 6px; }
   .check { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
   .hint { font-size: 13px; color: var(--ink-2); margin: 4px 0 0; }
@@ -90,6 +98,7 @@
   </nav>
 </header>
 
+<div style="padding:0 16px"><div class="pub" id="pub" hidden></div></div>
 <main id="app"></main>
 <div class="actions" id="actions" hidden><div class="in" id="actionsIn"></div></div>
 
@@ -188,12 +197,34 @@ async function save(name, change, message) {
     await commit(files, message);
     data[name] = next; pending = [];
     busy();
-    toast('保存しました。1〜2分でサイトに反映されます。');
     render();
+    watchPublish(name, next);
   } catch (e) {
     busy(); console.error(e, e.detail);
     toast('保存できませんでした：' + e.message, true);
   }
+}
+
+// 保存したあと、公開中のサイトに反映されるまで見張って、上の帯で知らせる
+let watchId = 0;
+async function watchPublish(name, next) {
+  const id = ++watchId, want = JSON.stringify(next), t0 = Date.now();
+  const bar = $('#pub');
+  const show = (html, cls) => { bar.className = 'pub ' + (cls || ''); bar.innerHTML = html; bar.hidden = false; };
+  show('✅ 保存しました。<b>サイトに反映されるのを待っています…</b>（ふつう1〜2分）');
+  while (id === watchId && Date.now() - t0 < 6 * 60 * 1000) {
+    await new Promise(r => setTimeout(r, 8000));
+    try {
+      const r = await fetch(`../${FILES[name]}?t=${Date.now()}`, { cache: 'no-store' });
+      if (r.ok && JSON.stringify(await r.json()) === want) {
+        if (id !== watchId) return;
+        show('🎉 <b>サイトに反映されました。</b> <a href="../" target="_blank" rel="noopener">サイトを見る ↗</a>（開いたままのページは、再読み込みすると新しくなります）', 'ok');
+        setTimeout(() => { if (id === watchId) bar.hidden = true; }, 20000);
+        return;
+      }
+    } catch (e) {}
+  }
+  if (id === watchId) show('保存はできています。サイトへの反映に時間がかかっています。少したってからサイトを再読み込みしてください。', 'slow');
 }
 
 /* ───── 画像：端末の中で縮小して WebP（だめなら JPEG）にする ───── */
@@ -225,7 +256,8 @@ async function addImage(file, dir, base, opt) {
   return path;
 }
 // 画面に出すときは、まだ保存していない画像は手元のデータを使う
-const src = p => { const n = pending.find(x => x.path === p); return n ? n.url : '../' + p; };
+const RAW = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/`;
+const src = p => { if (!p) return ''; const n = pending.find(x => x.path === p); return n ? n.url : RAW + p; };
 
 /* ───── 小物 ───── */
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
@@ -350,17 +382,25 @@ function imgField(el, { paths, many, dir, base, opt, cls = '' }) {
   let list = [...(paths || [])];
   const draw = () => {
     el.innerHTML = `<div class="imgs">${list.map((p, i) => `<figure><img class="${cls} ${pending.some(x => x.path === p) ? 'new' : ''}" src="${esc(src(p))}" alt=""><button type="button" data-rm="${i}" title="外す">×</button></figure>`).join('')}</div>
-      <p style="margin:8px 0 0"><label class="pick">📷 ${list.length && !many ? '写真を差し替える' : '写真を選ぶ'}<input type="file" accept="image/*" ${many ? 'multiple' : ''}></label></p>`;
+      <p style="margin:8px 0 0"><label class="pick">📷 ${list.length && !many ? '写真を差し替える' : '写真を選ぶ'}<input type="file" accept="image/*" ${many ? 'multiple' : ''}></label><span class="drophint">または、ここに写真をドラッグ＆ドロップ</span></p>`;
     $$('[data-rm]', el).forEach(b => b.onclick = () => { list.splice(+b.dataset.rm, 1); el.dataset.dirty = '1'; draw(); });
-    $('input', el).onchange = async e => {
-      const files = [...e.target.files]; if (!files.length) return;
-      busy('写真を整えています…');
-      try {
-        for (const f of files) { const p = await addImage(f, dir(), base(), opt); if (many) list.push(p); else list = [p]; }
-      } catch (err) { toast('写真を読み込めませんでした（' + err.message + '）', true); }
-      busy(); el.dataset.dirty = '1'; draw();
-    };
+    $('input', el).onchange = e => take([...e.target.files]);
   };
+  const take = async files => {
+    files = files.filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|webp|heic|gif)$/i.test(f.name));
+    if (!files.length) return toast('画像のファイルを選んでください', true);
+    if (!many) files = files.slice(0, 1);
+    busy('写真を整えています…');
+    try {
+      for (const f of files) { const p = await addImage(f, dir(), base(), opt); if (many) list.push(p); else list = [p]; }
+    } catch (err) { toast('写真を読み込めませんでした（' + err.message + '）', true); }
+    busy(); el.dataset.dirty = '1'; draw();
+  };
+  // ドラッグ＆ドロップ（パソコン）：この欄に写真を落とすと追加
+  el.classList.add('drop');
+  el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('over'); });
+  el.addEventListener('dragleave', e => { if (!el.contains(e.relatedTarget)) el.classList.remove('over'); });
+  el.addEventListener('drop', e => { e.preventDefault(); el.classList.remove('over'); take([...e.dataTransfer.files]); });
   draw();
   return () => list;
 }
@@ -504,6 +544,7 @@ function editVideo(id) {
 /* ───── はじまり ───── */
 $$('#tabs button').forEach(b => b.onclick = () => { if (b.dataset.tab === tab || confirmLeave()) { tab = b.dataset.tab; render(); } });
 $('#logout').onclick = () => { if (confirm('この端末に保存したカギを消します。次に使うときはカギをもう一度入れてください。')) { store.del(KEY); token = ''; renderSetup(); } };
+['dragover', 'drop'].forEach(t => window.addEventListener(t, e => { if (!e.target.closest || !e.target.closest('.drop')) e.preventDefault(); }));
 window.addEventListener('beforeunload', e => { if (pending.length) { e.preventDefault(); e.returnValue = ''; } });
 if (token) start(); else renderSetup();
 </script>
