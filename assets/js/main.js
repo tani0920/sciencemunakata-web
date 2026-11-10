@@ -75,19 +75,8 @@
     return `<ruby>${kanji}<rt>${RUBY[w]}</rt></ruby>${rest}`;
   });
   const er = t => rb(esc(t));
-  // 授業の申し込み：記入欄つきの文面が入った状態で公式LINEのトークを開く
-  // （保護者は空欄を埋めて送るだけ。項目の順番がそろうので、アプリへの登録もしやすい）
-  const applyText = c => {
-    const d = fmtDate(c.date);
-    // LINEのリッチメニューの「申し込む」と同じ項目・同じ順番（そちらは授業名が空欄）
-    // 項目名は里山ラボアプリの読み取り（parseLineApplication）と合わせている。変えるときはアプリも直す
-    return ['🌱授業の申し込み🌱', `📅参加する授業：${d.m}/${d.d}（${d.w}）${c.title}`,
-      '👤保護者のお名前：', '🧒お子さまのお名前・学年：', '👪いっしょに来るご家族：', '',
-      '🔰はじめての方は、こちらも', '🏠お住まい（町名まで）：', '💡参加のきっかけ：', '🔍里山ラボを知ったところ：'].join('\n');
-  };
-  const applyUrl = c => SITE.lineId
-    ? `https://line.me/R/oaMessage/${encodeURIComponent(SITE.lineId)}/?${encodeURIComponent(applyText(c))}`
-    : SITE.lineUrl;
+  // 授業の申し込み：記入欄つきの文面が入った状態で公式LINEのトークを開く（文面は assets/js/apply.js で共通）
+  const applyUrl = c => SITE.lineId && window.SATO_APPLY ? window.SATO_APPLY.url(SITE.lineId, c) : SITE.lineUrl;
   // ページに最初から書いてある見出しなど
   function rubyStatic() {
     $$('.hero-copy .hero-badge, .hero-lead, .sec-head h2, .gal-head b, #classes .sec-lead, #play .sec-lead, .gnav a, .venn .vl').forEach(el => {
