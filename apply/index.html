@@ -245,9 +245,11 @@ function form(err = '') {
   $('#addm').onclick = () => { $('#addbox').hidden = !$('#addbox').hidden; };
   $('#ak').onchange = () => { const adult = $('#ak').value === '大人'; $('#agw').hidden = adult; $('#arw').hidden = !adult; };
   $('#asave').onclick = async () => {
+    // 画面を切りかえる前に、入力欄の中身を読んでおく
     const name = $('#an').value.trim(); if (!name) return;
+    const body = { kind: $('#ak').value, name, grade: $('#ag').value, relation: $('#ar').value.trim() };
     loading('登録しています…');
-    const r = await api('addMember', { kind: $('#ak').value, name, grade: $('#ag').value, relation: $('#ar').value.trim() });
+    const r = await api('addMember', body);
     if (r.ok) { state = r; form(); } else form(r.error === 'network' || r.error === 'bad_response' ? '通信がうまくいきませんでした。もう一度お試しください。' : '登録できませんでした。');
   };
   $('#go').onclick = async () => {
