@@ -101,15 +101,44 @@ function stuck() {
       <p class="note" style="margin-top:10px">（${esc(navigator.userAgent.slice(0, 160))}）</p></div>`);
 }
 
-/* 許可画面の前の説明（サイト・リッチメニューから来た人向け） */
+/* ───── サイトから来た人（LINEの外で開いたとき） ───── */
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+const keep = (st => ({ get: k => { try { return st().getItem(k); } catch (_) { return null; } }, set: (k, v) => { try { st().setItem(k, v); } catch (_) {} } }));
+const local = keep(() => localStorage), session = keep(() => sessionStorage);
+const paramC = () => new URLSearchParams(location.search).get('c');
+const liffLink = () => LIFF_URL + (paramC() ? '?c=' + encodeURIComponent(paramC()) : '');
+const BACK = '/#next';
+
 function intro() {
-  const c = new URLSearchParams(location.search).get('c');
+  if (!isMobile) return pcOnly();
+  if (session.get('sato_launched')) return launched();      // LINEからサイトに戻ってきたとき
+  if (local.get('sato_intro_seen')) return launch();         // 2回目からは説明を出さずにLINEを開く
   view(`<div class="card"><h1>LINEで申し込む画面を開きます</h1>
       <p style="margin:10px 0">はじめて開くときだけ、LINEから<b>「サイエンス里山ラボ宗像」へのアクセスを許可するか</b>の確認画面が出ます。「許可する」を押すと申込画面に進みます。</p>
       <div class="sum" style="background:var(--sun-l)">🔒 里山ラボが受け取るのは、<b>LINEの表示名</b>と、<b>申し込みに使う番号</b>だけです。トークの内容や友だちの一覧を見ることはありません。</div>
-      <a class="btn line" href="${esc(LIFF_URL + (c ? '?c=' + encodeURIComponent(c) : ''))}">申込画面を開く</a>
+      <a class="btn line" id="openLiff" href="${esc(liffLink())}">申込画面を開く</a>
       <p class="note" style="margin:12px 0 0">許可したくない場合は、これまでどおりトークからお申し込みいただけます。</p>
-      <a class="btn sub" style="margin-top:8px" href="${esc(talkUrl(null))}">トークで申し込む</a></div>`);
+      <a class="btn sub" style="margin-top:8px" href="${esc(talkUrl(null))}">トークで申し込む</a>
+      <p style="margin:14px 0 0;text-align:center"><a href="${BACK}">← サイトに戻る</a></p></div>`);
+  $('#openLiff').onclick = () => { local.set('sato_intro_seen', '1'); session.set('sato_launched', '1'); setTimeout(launched, 1000); };
+}
+function launch() {
+  session.set('sato_launched', '1');
+  launched();
+  location.href = liffLink();
+}
+function launched() {
+  view(`<div class="card"><h2>LINEで申込画面を開いています</h2>
+      <p class="sub">LINEが開かないときは、下のボタンを押してください。</p>
+      <p style="margin:12px 0 8px"><a class="btn line" href="${esc(liffLink())}">LINEで申込画面を開く</a></p>
+      <a class="btn sub" href="${BACK}">サイトに戻る</a>
+      <p class="note" style="margin:12px 0 0;text-align:center"><a href="${esc(talkUrl(null))}">トークで申し込む</a>こともできます</p></div>`);
+}
+function pcOnly() {
+  view(`<div class="card"><h2>スマートフォンのLINEで開いてください</h2>
+      <p style="margin:10px 0">申込画面はスマートフォンのLINEの中で動くため、パソコンからは開けません。</p>
+      <div class="sum" style="background:var(--sun-l)">📱 スマートフォンでサイトを開いて「LINEで申し込む」を押すか、LINEの里山ラボのトークで、下のメニューの「申し込む」からどうぞ。</div>
+      <a class="btn sub" href="${BACK}">サイトに戻る</a></div>`);
 }
 
 /* サーバーとのやりとり。返事がない・おかしいときも止まらずに {ok:false} を返す */
@@ -175,7 +204,8 @@ function route() {
 /* ───── 授業をえらぶ ───── */
 function pickClass() {
   view(`<div class="card"><h2>どの授業に申し込みますか？</h2>
-    ${openClasses().map(c => `<button class="cls" data-id="${esc(c.id)}"><b>${esc(label(c))}</b>${c.subtitle ? `<span class="note">${esc(c.subtitle)}</span>` : ''}</button>`).join('')}</div>`);
+    <p class="sub" style="margin-bottom:10px">1つずつ申し込めます。</p>
+    ${openClasses().map(c => `<button class="cls" data-id="${esc(c.id)}"><b>${esc(label(c))}</b>${c.subtitle ? `<span class="note">${esc(c.subtitle)}</span>` : ''}${state && (state.applied || []).includes(c.id) ? '<span class="pill mem" style="margin:6px 0 0">申し込み済み</span>' : ''}</button>`).join('')}</div>`);
   app.querySelectorAll('.cls').forEach(b => b.onclick = () => { cls = classes.find(c => c.id === b.dataset.id); route(); });
 }
 
@@ -291,6 +321,8 @@ function form(err = '') {
 
 /* ───── 申込完了 ───── */
 async function done(r) {
+  state.applied = [...new Set([...(state.applied || []), cls.id])];
+  const others = openClasses().filter(c => !state.applied.includes(c.id));
   const text = ['🌱授業の申し込み（かんたん申込）', ...r.summary].join('\n');
   let sent = false;
   try {
@@ -303,8 +335,10 @@ async function done(r) {
       <div class="sum">${esc(r.summary.join('\n'))}</div>
       <p class="sub">${sent ? 'トークにも内容を送りました。' : ''}担当者から、LINEで受付のご連絡をします🌱</p>
       <div class="sum" style="background:var(--sun-l)">🙏 キャンセルするときは、LINEのトークでメッセージをお送りください。</div>
-      ${liff.isInClient() ? '<p style="margin-top:16px"><button class="btn sub" id="close">とじる</button></p>' : ''}</div>`);
+      ${others.length ? '<p style="margin-top:16px"><button class="btn" id="more">ほかの授業にも申し込む</button></p>' : ''}
+      ${liff.isInClient() ? '<p style="margin-top:12px"><button class="btn sub" id="close">とじる</button></p>' : `<p style="margin-top:12px"><a class="btn sub" href="${BACK}">サイトに戻る</a></p>`}</div>`);
   $('#close') && ($('#close').onclick = () => liff.closeWindow());
+  $('#more') && ($('#more').onclick = () => { cls = null; extra = { a: 0, k: 0 }; pickClass(); });
 }
 </script>
 </body>
