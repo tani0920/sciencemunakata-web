@@ -421,6 +421,35 @@
     $('#vlist').innerHTML = all.map(v => `<button class="vthumb" data-v="${esc(v.id)}"><div class="th" style="background-image:url('${thumb(v.id)}')"></div><span>${esc(v.title)}</span></button>`).join('');
     $('#vlist').addEventListener('click', e => { const b = e.target.closest('.vthumb'); if (b) { show(all.find(v => v.id === b.dataset.v), true); $('#player').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' }); } });
     show(all[0], false);
+    setupVlistNav(all.length);
+  }
+  // 動画の一覧：横にスライドできることが分かるように（矢印・はしのぼかし・最初に少し動かす）
+  function setupVlistNav(n) {
+    const list = $('#vlist'), wrap = $('#vlistWrap'), head = $('#vlistHead');
+    const step = () => Math.max(list.clientWidth * 0.8, 220);
+    $('.vnav-prev', wrap).addEventListener('click', () => list.scrollBy({ left: -step(), behavior: reduceMotion ? 'auto' : 'smooth' }));
+    $('.vnav-next', wrap).addEventListener('click', () => list.scrollBy({ left: step(), behavior: reduceMotion ? 'auto' : 'smooth' }));
+    const update = () => {
+      const max = list.scrollWidth - list.clientWidth;
+      const can = max > 4;
+      wrap.classList.toggle('can-scroll', can);
+      wrap.classList.toggle('at-start', list.scrollLeft <= 4);
+      wrap.classList.toggle('at-end', list.scrollLeft >= max - 4);
+      head.hidden = !can;
+      $('#vlistCount').textContent = `ぜんぶで ${n} 本`;
+    };
+    list.addEventListener('scroll', update, { passive: true });
+    addEventListener('resize', update);
+    update();
+    // はじめて画面に入ったとき、少しだけ横に動かして「スライドできる」と見せる
+    if (reduceMotion || !('IntersectionObserver' in window)) return;
+    const ob = new IntersectionObserver(es => {
+      if (!es[0].isIntersecting) return; ob.disconnect();
+      if (!wrap.classList.contains('can-scroll') || list.scrollLeft > 4) return;
+      setTimeout(() => { list.style.scrollSnapType = 'none'; list.scrollTo({ left: 90, behavior: 'smooth' });
+        setTimeout(() => { list.scrollTo({ left: 0, behavior: 'smooth' }); setTimeout(() => list.style.scrollSnapType = '', 600); }, 700); }, 400);
+    }, { threshold: 0.6 });
+    ob.observe(list);
   }
 
   /* ───── あそぶ ───── */

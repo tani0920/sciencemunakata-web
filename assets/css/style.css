@@ -510,6 +510,31 @@ p { margin: 0 0 1em; }
 .vthumb:hover .th { transform: translateY(-3px); }
 .vthumb.on .th { border-color: var(--sun); }
 .vthumb span { display: block; font-size: .8rem; font-weight: 700; line-height: 1.5; margin-top: 6px; color: #CDD4E6; }
+/* 動画の一覧：横にスライドできる目印 */
+.vlist-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 0 4px 10px; font-size: .85rem; font-weight: 900; }
+.vlist-head[hidden] { display: none; }
+.vlist-count { color: #CDD4E6; }
+.vlist-hint { color: var(--sun); display: inline-flex; align-items: center; gap: 6px; }
+.hint-mouse { display: none; }
+@media (hover: hover) and (pointer: fine) { .hint-touch { display: none; } .hint-mouse { display: inline-flex; } }
+.swipe-ic { display: inline-block; animation: swipe-hint 1.6s ease-in-out infinite; }
+@keyframes swipe-hint { 0%, 100% { transform: translateX(6px); } 50% { transform: translateX(-6px) rotate(-8deg); } }
+.vlist-wrap { position: relative; }
+.vlist-wrap.can-scroll .vlist { -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 36px, #000 calc(100% - 56px), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 36px, #000 calc(100% - 56px), transparent 100%); }
+.vlist-wrap.can-scroll.at-start .vlist { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 56px), transparent 100%); mask-image: linear-gradient(90deg, #000 calc(100% - 56px), transparent 100%); }
+.vlist-wrap.can-scroll.at-end .vlist { -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 36px); mask-image: linear-gradient(90deg, transparent 0, #000 36px); }
+.vnav {
+  position: absolute; top: calc(50% - 22px); transform: translateY(-50%); z-index: 2; display: none;
+  width: 44px; height: 44px; border-radius: 50%; border: 3px solid #fff; background: var(--sun); color: var(--ink);
+  font: 900 1.7rem/1 sans-serif; padding-bottom: 4px; cursor: pointer; box-shadow: 0 4px 0 rgba(0, 0, 0, .35); transition: transform .15s, opacity .2s;
+}
+.vnav:hover { transform: translateY(-50%) scale(1.1); }
+.vnav-prev { left: -10px; }
+.vnav-next { right: -10px; }
+.vlist-wrap.can-scroll .vnav { display: grid; place-items: center; }
+.vlist-wrap.at-start .vnav-prev, .vlist-wrap.at-end .vnav-next { opacity: 0; pointer-events: none; }
+@media (max-width: 760px) { .vnav { width: 38px; height: 38px; font-size: 1.4rem; } .vnav-prev { left: -4px; } .vnav-next { right: -4px; } }
+@media (prefers-reduced-motion: reduce) { .swipe-ic { animation: none; } }
 .more-link { text-align: center; margin: 12px 0 0; }
 .more-link a { color: var(--sun); font-weight: 900; }
 

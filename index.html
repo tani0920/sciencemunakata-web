@@ -38,7 +38,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=202611101657">
+<link rel="stylesheet" href="assets/css/style.css?v=202611121200">
 </head>
 <body>
 
@@ -237,7 +237,16 @@
         <p class="sec-lead">これまでの授業をダイジェスト動画で。ページの中でそのまま見られます。</p>
       </div>
       <div class="player reveal" id="player"></div>
-      <div class="vlist" id="vlist"></div>
+      <div class="vlist-head" id="vlistHead" hidden>
+        <span class="vlist-count" id="vlistCount"></span>
+        <span class="vlist-hint hint-touch"><span class="swipe-ic" aria-hidden="true">👆</span>よこにスライドして、ほかの授業も見てね</span>
+        <span class="vlist-hint hint-mouse">左右の矢印で、ほかの授業も見られます <span class="swipe-ic" aria-hidden="true">▶</span></span>
+      </div>
+      <div class="vlist-wrap" id="vlistWrap">
+        <button class="vnav vnav-prev" type="button" aria-label="前の動画へ">‹</button>
+        <div class="vlist" id="vlist"></div>
+        <button class="vnav vnav-next" type="button" aria-label="次の動画へ">›</button>
+      </div>
       <p class="more-link"><a href="#" class="js-yt" target="_blank" rel="noopener">YouTubeチャンネルを見る →</a></p>
     </div>
   </section>
@@ -360,6 +369,6 @@
 
 <script src="assets/js/icons.js?v=202611101657"></script>
 <script src="assets/js/apply.js?v=202611101657"></script>
-<script src="assets/js/main.js?v=202611112300"></script>
+<script src="assets/js/main.js?v=202611121200"></script>
 </body>
 </html>
