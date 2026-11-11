@@ -233,6 +233,7 @@ function form(err = '') {
       <div class="row"><span>大人</span><span class="stepper"><button data-s="a-">−</button><output id="xa">${extra.a}</output><button data-s="a+">＋</button></span></div>
       <div class="row"><span>子ども</span><span class="stepper"><button data-s="k-">−</button><output id="xk">${extra.k}</output><button data-s="k+">＋</button></span></div>
       <label class="field" style="margin-top:12px"><span>連絡事項（任意）</span><textarea id="note" maxlength="300" placeholder="アレルギーや、遅れて来るなど"></textarea></label>
+      <div class="err" id="ferr" hidden></div>
       <button class="btn line" id="go">この内容で申し込む</button>
       <p class="note" style="margin:10px 0 0">参加費は当日受付でお支払いください。くわしい集合場所や持ち物は、授業の前日までにLINEでご案内します。<br>申し込んだあとにキャンセルするときは、LINEのトークでご連絡ください。</p>
     </div>`);
@@ -254,11 +255,15 @@ function form(err = '') {
   };
   $('#go').onclick = async () => {
     const ids = [...app.querySelectorAll('label.chk input:checked')].map(i => i.value);
-    if (!ids.length && !extra.a && !extra.k) return form('来る人にチェックしてください。');
+    const adultIds = f.members.filter(m => m.kind === '大人').map(m => m.id);
+    // 入力は消さずに、ボタンのすぐ上にお知らせを出す
+    const warn = msg => { const e = $('#ferr'); e.textContent = msg; e.hidden = false; e.scrollIntoView({ block: 'center', behavior: 'smooth' }); };
+    if (!ids.length && !extra.a && !extra.k) return warn('来る人にチェックしてください。');
+    if (!ids.some(id => adultIds.includes(id)) && !extra.a) return warn('いっしょに来る大人の方（保護者）を、1人以上チェックしてください。');
     const note = $('#note').value.trim();
     loading('送っています…');
     const r = await api('apply', { classId: cls.id, memberIds: ids, extraAdults: extra.a, extraKids: extra.k, note });
-    if (!r.ok) return form(r.error === 'closed' ? 'この授業の受付は終わっています。' : '送れませんでした。もう一度お試しください。');
+    if (!r.ok) return form(r.error === 'closed' ? 'この授業の受付は終わっています。' : r.error === 'no_adult' ? 'いっしょに来る大人の方（保護者）を、1人以上チェックしてください。' : '送れませんでした。もう一度お試しください。');
     done(r);
   };
 }
