@@ -135,14 +135,35 @@ function launched() {
       <p class="note" style="margin:12px 0 0;text-align:center"><a href="${esc(talkUrl(null))}">トークで申し込む</a>こともできます</p></div>`);
 }
 function pcOnly() {
-  view(`<div class="card"><h2>スマートフォンのLINEで開いてください</h2>
-      <p style="margin:10px 0">申込画面はスマートフォンのLINEの中で動くため、パソコンからは開けません。</p>
-      <div class="sum" style="background:var(--sun-l)">📱 スマートフォンでサイトを開いて「LINEで申し込む」を押すか、LINEの里山ラボのトークで、下のメニューの「申し込む」からどうぞ。</div>
+  view(`<div class="card" style="text-align:center"><h2>スマートフォンのLINEで開いてください</h2>
+      <p style="margin:10px 0;text-align:left">申込画面はスマートフォンのLINEの中で動くため、パソコンからは開けません。下のQRコードをスマートフォンのカメラで読み取ると、申込画面が開きます。</p>
+      <div id="qr" style="display:inline-block;padding:14px;background:#fff;border:3px solid var(--ink);border-radius:18px;margin:6px 0 14px"></div>
+      <p class="note" style="text-align:left;margin:0 0 14px">スマートフォンのLINEで、里山ラボのトークの下のメニュー「申し込む」からも申し込めます。</p>
       <a class="btn sub" href="${BACK}">サイトに戻る</a></div>`);
+  // この申込画面（授業つき）のQRコード
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  s.onload = () => new QRCode($('#qr'), { text: location.origin + '/apply/' + (paramC() ? '?c=' + encodeURIComponent(paramC()) : ''), width: 200, height: 200, colorDark: '#26314D', colorLight: '#ffffff' });
+  s.onerror = () => { $('#qr').outerHTML = `<p><b>${esc(location.origin + '/apply/')}</b></p>`; };
+  document.head.appendChild(s);
+}
+
+/* 見本モード（?demo=1）：告知用のスクショを撮るための架空の家族。LINEにもサーバーにもつながない */
+const DEMO = new URLSearchParams(location.search).get('demo') === '1';
+const inClient = () => { try { return !DEMO && liff.isInClient(); } catch (_) { return false; } };
+const DEMO_STATE = { ok: true, linked: true, applied: [], family: { name: '里山 はじめ', member: true, members: [
+  { id: 'd1', kind: '子ども', name: '里山 そら', grade: '小3' }, { id: 'd2', kind: '子ども', name: '里山 こはる', grade: '年中' },
+  { id: 'd3', kind: '大人', name: '里山 はじめ', relation: '父' }, { id: 'd4', kind: '大人', name: '里山 みどり', relation: '母' }] } };
+function demoApi(action, body) {
+  if (action !== 'apply') return DEMO_STATE;
+  const m = DEMO_STATE.family.members.filter(x => body.memberIds.includes(x.id));
+  return { ok: true, label: label(cls), summary: [`📅 ${label(cls)}`, '👪 里山 はじめさん',
+    '🙋 ' + m.map(x => x.grade ? `${x.name}（${x.grade}）` : x.name).join('、'), '💰 参加費のめやす：3,000円（会員）／未就学のお子さまは無料'] };
 }
 
 /* サーバーとのやりとり。返事がない・おかしいときも止まらずに {ok:false} を返す */
 async function api(action, body = {}) {
+  if (DEMO) return demoApi(action, body);
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), 30000);
   try {
@@ -163,6 +184,12 @@ function openClasses() {
 /* ───── はじまり ───── */
 (async () => {
   try {
+    if (DEMO) {
+      const cj = await fetch('/data/classes.json?t=' + Date.now()).then(r => r.json());
+      classes = Array.isArray(cj) ? cj : cj.classes;
+      cls = openClasses().find(c => c.id === paramC()) || openClasses()[0] || classes[0];
+      state = DEMO_STATE; return form();
+    }
     if (!API) return fail('申込画面の準備中です。');
     loading('LINEとつないでいます…');
     const slow = setTimeout(stuck, 15000);   // 15秒たっても進まないときは、開き直しの案内を出す
@@ -267,7 +294,7 @@ function form(err = '') {
       ${f.member ? '' : `<p class="note" style="margin:-6px 0 14px">🌱 会員になると、授業料が1回3,000円になります（年会費1,000円）。<a href="${esc(FORM_URL + '?usp=pp_url&' + FORM_LINE_ENTRY + '=' + encodeURIComponent(sub))}" target="_blank" rel="noopener">入会のご案内</a></p>`}
       <div class="err" id="ferr" hidden></div>
       <button class="btn line" id="go">この内容で申し込む</button>
-      <p class="note" style="margin:10px 0 0">参加費は当日受付でお支払いください。くわしい集合場所や持ち物は、授業の前日までにLINEでご案内します。<br>申し込んだあとにキャンセルするときは、LINEのトークでご連絡ください。</p>
+      <p class="note" style="margin:10px 0 0">参加費は当日受付でお支払いください。くわしい集合場所や持ち物は、授業の前日までにLINEでご案内します。<br>来る人が変わったときは、この画面からもう一度申し込むと、新しい内容に変わります。<br>キャンセルするときは、LINEのトークでご連絡ください。</p>
     </div>`);
   $('#chg') && ($('#chg').onclick = () => { cls = null; pickClass(); });
   app.querySelectorAll('[data-s]').forEach(b => b.onclick = () => {
@@ -334,9 +361,10 @@ async function done(r) {
       <h1>${r.changed ? '申し込みの内容を変えました' : 'お申し込みを受け付けました'}</h1>
       <div class="sum">${esc(r.summary.join('\n'))}</div>
       <p class="sub">${sent ? 'トークにも内容を送りました。' : ''}担当者から、LINEで受付のご連絡をします🌱</p>
-      <div class="sum" style="background:var(--sun-l)">🙏 キャンセルするときは、LINEのトークでメッセージをお送りください。</div>
+      <div class="sum" style="background:var(--sun-l)">✏️ 来る人が変わったときは、もう一度この申込画面から申し込むと、新しい内容に変わります。
+🙏 キャンセルするときは、LINEのトークでメッセージをお送りください。</div>
       ${others.length ? '<p style="margin-top:16px"><button class="btn" id="more">ほかの授業にも申し込む</button></p>' : ''}
-      ${liff.isInClient() ? '<p style="margin-top:12px"><button class="btn sub" id="close">とじる</button></p>' : `<p style="margin-top:12px"><a class="btn sub" href="${BACK}">サイトに戻る</a></p>`}</div>`);
+      ${inClient() ? '<p style="margin-top:12px"><button class="btn sub" id="close">とじる</button></p>' : `<p style="margin-top:12px"><a class="btn sub" href="${BACK}">サイトに戻る</a></p>`}</div>`);
   $('#close') && ($('#close').onclick = () => liff.closeWindow());
   $('#more') && ($('#more').onclick = () => { cls = null; extra = { a: 0, k: 0 }; pickClass(); });
 }
