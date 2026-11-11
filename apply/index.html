@@ -96,8 +96,7 @@ function intro() {
   const c = new URLSearchParams(location.search).get('c');
   view(`<div class="card"><h1>LINEで申し込む画面を開きます</h1>
       <p style="margin:10px 0">はじめて開くときだけ、LINEから<b>「サイエンス里山ラボ宗像」へのアクセスを許可するか</b>の確認画面が出ます。「許可する」を押すと申込画面に進みます。</p>
-      <div class="sum" style="background:var(--sun-l)">🔒 里山ラボが受け取るのは、<b>LINEの表示名</b>と、<b>申し込みに使う番号</b>だけです。トークの内容や友だちの一覧を見ることはありません。
-📝 申し込んだ内容を、里山ラボとのトークに送るための許可もふくまれます。申し込むボタンを押したときだけ送ります。</div>
+      <div class="sum" style="background:var(--sun-l)">🔒 里山ラボが受け取るのは、<b>LINEの表示名</b>と、<b>申し込みに使う番号</b>だけです。トークの内容や友だちの一覧を見ることはありません。</div>
       <a class="btn line" href="${esc(LIFF_URL + (c ? '?c=' + encodeURIComponent(c) : ''))}">申込画面を開く</a>
       <p class="note" style="margin:12px 0 0">許可したくない場合は、これまでどおりトークからお申し込みいただけます。</p>
       <a class="btn sub" style="margin-top:8px" href="${esc(talkUrl(null))}">トークで申し込む</a></div>`);
