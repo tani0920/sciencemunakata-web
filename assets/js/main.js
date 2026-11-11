@@ -75,8 +75,11 @@
     return `<ruby>${kanji}<rt>${RUBY[w]}</rt></ruby>${rest}`;
   });
   const er = t => rb(esc(t));
-  // 授業の申し込み：記入欄つきの文面が入った状態で公式LINEのトークを開く（文面は assets/js/apply.js で共通）
-  const applyUrl = c => SITE.lineId && window.SATO_APPLY ? window.SATO_APPLY.url(SITE.lineId, c) : SITE.lineUrl;
+  // 授業の申し込み：LINEで開く申込画面（/apply/）。トークで申し込む今までの方法（記入欄つきの文面）も小さく並べて残す
+  const applyUrl = c => `/apply/?c=${encodeURIComponent(c.id)}`;
+  const talkUrl = c => SITE.lineId && window.SATO_APPLY ? window.SATO_APPLY.url(SITE.lineId, c) : SITE.lineUrl;
+  const applyLinks = c => `<a class="btn btn-line" href="${esc(applyUrl(c))}" data-class="${esc(window.SATO_APPLY ? window.SATO_APPLY.label(c) : c.title)}">${lineIcon}LINEで申し込む</a>
+    <p class="apply-hint">会員・参加したことのある方は、来る人をえらぶだけ。<br><a href="${esc(talkUrl(c))}" data-class="${esc(window.SATO_APPLY ? window.SATO_APPLY.label(c) : c.title)}" target="_blank" rel="noopener">トークで申し込む</a>こともできます</p>`;
   // ページに最初から書いてある見出しなど
   function rubyStatic() {
     $$('.hero-copy .hero-badge, .hero-lead, .sec-head h2, .gal-head b, #classes .sec-lead, #play .sec-lead, .gnav a, .venn .vl').forEach(el => {
@@ -103,7 +106,8 @@
     document.addEventListener('click', e => {
       const a = e.target.closest('a'); if (!a) return;
       const h = a.getAttribute('href') || '';
-      if (h.includes('oaMessage')) gtag('event', 'apply_class', { class_title: a.dataset.class || '' });
+      if (h.includes('/apply/')) gtag('event', 'apply_class', { class_title: a.dataset.class || '', method: 'app' });
+      else if (h.includes('oaMessage')) gtag('event', 'apply_class', { class_title: a.dataset.class || '', method: 'talk' });
       else if (/forms\.gle|docs\.google\.com\/forms/.test(h)) gtag('event', 'join_form');
       else if (a.matches('.js-line, .btn-line, .lf-btn')) gtag('event', 'line_click');
     });
@@ -180,8 +184,7 @@
       </div>
       <div class="next-side">
         <p class="countdown">${n === 0 ? '<b>きょう</b>！' : `あと<b>${n}</b>日`}</p>
-        <a class="btn btn-line" href="${esc(applyUrl(c))}" data-class="${esc(window.SATO_APPLY ? window.SATO_APPLY.label(c) : c.title)}" target="_blank" rel="noopener">${lineIcon}LINEで申し込む</a>
-        <p class="apply-hint">記入欄つきの文が入った状態でLINEが開きます</p>
+        ${applyLinks(c)}
         <p style="margin:10px 0 0"><a href="#" data-open="${esc(c.id)}">くわしく見る →</a></p>
       </div>
       <img class="next-chara" src="${CH}pink-5.webp" alt="">`;
@@ -350,7 +353,7 @@
         ${gal ? `<p class="md-sub">授業のようす</p><div class="md-gallery">${gal}</div>` : ''}
         ${c.notes?.length ? `<ul class="md-notes">${c.notes.map(n => `<li>${er(n)}</li>`).join('')}</ul>` : ''}
         ${t ? `<div class="md-teacher">${t.photo ? `<img src="${esc(t.photo)}" alt="">` : ''}<p><b>${esc(t.name)} 先生</b><br>${esc(t.bio)}</p></div>` : ''}
-        ${!st ? `<div class="md-cta"><a class="btn btn-line" href="${esc(applyUrl(c))}" data-class="${esc(window.SATO_APPLY ? window.SATO_APPLY.label(c) : c.title)}" target="_blank" rel="noopener">${lineIcon}LINEで申し込む</a><p class="apply-hint">記入欄つきの文が入った状態でLINEが開きます。空欄をうめて送ってください</p></div>` : ''}
+        ${!st ? `<div class="md-cta">${applyLinks(c)}</div>` : ''}
       </div></div>`;
     modal.showModal();
     $('#classModalBody').scrollTop = 0;

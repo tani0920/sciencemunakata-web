@@ -34,7 +34,8 @@
       document.addEventListener('click', e => {
         const a = e.target.closest('a'); if (!a) return;
         const h = a.getAttribute('href') || '';
-        if (h.includes('oaMessage')) gtag('event', 'apply_class', { class_title: a.dataset.class || '' });
+        if (h.includes('/apply/')) gtag('event', 'apply_class', { class_title: a.dataset.class || '', method: 'app' });
+        else if (h.includes('oaMessage')) gtag('event', 'apply_class', { class_title: a.dataset.class || '', method: 'talk' });
         else if (/forms\.gle|docs\.google\.com\/forms/.test(h)) gtag('event', 'join_form');
         else if (a.matches('.js-line, .btn-line, .lf-btn')) gtag('event', 'line_click');
       });
