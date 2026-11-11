@@ -74,7 +74,8 @@ const API = 'https://script.google.com/macros/s/AKfycbxwrWoj9COdfvQTA8FFcYHzIxQu
 const LINE_ID = '@268rzaol';
 const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdKTemHU1x4ZcK8WrYHPiplf-ZH3Ttc3h5IkumnMuz470D9SQ/viewform';
 const FORM_LINE_ENTRY = 'entry.289709082';
-const GRADES = ['年少', '年中', '年長', '小1', '小2', '小3', '小4', '小5', '小6', '中1', '中2', '中3', '高1', '高2', '高3', '未就学'];
+const GRADES = ['0〜2歳', '年少', '年中', '年長', '小1', '小2', '小3', '小4', '小5', '小6', '中1', '中2以上'];
+const LIFF_URL = 'https://liff.line.me/' + LIFF_ID;
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -90,9 +91,29 @@ function fail(msg, c) {
     <a class="btn line" href="${esc(talkUrl(c))}">LINEのトークで申し込む</a></div>`);
 }
 
+/* 許可画面の前の説明（サイト・リッチメニューから来た人向け） */
+function intro() {
+  const c = new URLSearchParams(location.search).get('c');
+  view(`<div class="card"><h1>LINEで申し込む画面を開きます</h1>
+      <p style="margin:10px 0">はじめて開くときだけ、LINEから<b>「サイエンス里山ラボ宗像」へのアクセスを許可するか</b>の確認画面が出ます。「許可する」を押すと申込画面に進みます。</p>
+      <div class="sum" style="background:var(--sun-l)">🔒 里山ラボが受け取るのは、<b>LINEの表示名</b>と、<b>申し込みに使う番号</b>だけです。トークの内容や友だちの一覧を見ることはありません。
+📝 申し込んだ内容を、里山ラボとのトークに送るための許可もふくまれます。申し込むボタンを押したときだけ送ります。</div>
+      <a class="btn line" href="${esc(LIFF_URL + (c ? '?c=' + encodeURIComponent(c) : ''))}">申込画面を開く</a>
+      <p class="note" style="margin:12px 0 0">許可したくない場合は、これまでどおりトークからお申し込みいただけます。</p>
+      <a class="btn sub" style="margin-top:8px" href="${esc(talkUrl(null))}">トークで申し込む</a></div>`);
+}
+
+/* サーバーとのやりとり。返事がない・おかしいときも止まらずに {ok:false} を返す */
 async function api(action, body = {}) {
-  const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action, idToken: liff.getIDToken(), ...body }) });
-  return r.json();
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 30000);
+  try {
+    const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action, idToken: liff.getIDToken(), ...body }), signal: ctl.signal });
+    const t = await r.text();
+    try { return JSON.parse(t); } catch (_) { console.warn(t.slice(0, 300)); return { ok: false, error: 'bad_response' }; }
+  } catch (e) {
+    console.warn(e); return { ok: false, error: 'network' };
+  } finally { clearTimeout(timer); }
 }
 
 function label(c) { return window.SATO_APPLY ? window.SATO_APPLY.label(c) : c.title; }
@@ -106,7 +127,11 @@ function openClasses() {
   try {
     if (!API) return fail('申込画面の準備中です。');
     await liff.init({ liffId: LIFF_ID });
-    if (!liff.isLoggedIn()) { liff.login({ redirectUri: location.href }); return; }
+    if (!liff.isLoggedIn()) {
+      // LINEの中（LIFF）で開いたときはそのままログイン。サイトなどから来たときは、許可画面の前に説明を出す
+      if (liff.isInClient()) { liff.login({ redirectUri: location.href }); return; }
+      return intro();
+    }
     const tok = liff.getDecodedIDToken(); sub = tok && tok.sub || '';
     const [cj, me] = await Promise.all([fetch('/data/classes.json?t=' + Date.now()).then(r => r.json()), api('me')]);
     classes = Array.isArray(cj) ? cj : cj.classes;
@@ -143,8 +168,9 @@ function linkForm(err = '') {
       <p class="sub">次からは、来る人にチェックするだけで申し込めます。</p>
       ${err ? `<div class="err">${esc(err)}</div>` : ''}
       <div style="margin-top:14px">
-        <label class="field"><span>保護者のお名前</span><input type="text" id="lp" placeholder="例：里山 花子" autocomplete="name"></label>
-        <label class="field"><span>お子さまのお名前（どなたか1人）</span><input type="text" id="lc" placeholder="例：里山 たろう"></label>
+        <label class="field"><span>保護者のお名前（フルネーム）</span><input type="text" id="lp" placeholder="例：里山花子" autocomplete="name"></label>
+        <label class="field"><span>お子さまのお名前（どなたか1人・下の名前だけでもOK）</span><input type="text" id="lc" placeholder="例：たろう"></label>
+        <p class="note" style="margin:-4px 0 12px">スペースはあってもなくても大丈夫です。漢字・ひらがな・カタカナ、どれでも探せます。</p>
       </div>
       <button class="btn" id="lgo">確認する</button>
     </div>
@@ -204,7 +230,7 @@ function form(err = '') {
     const name = $('#an').value.trim(); if (!name) return;
     loading('登録しています…');
     const r = await api('addMember', { kind: $('#ak').value, name, grade: $('#ag').value, relation: $('#ar').value.trim() });
-    if (r.ok) { state = r; form(); } else form('登録できませんでした。');
+    if (r.ok) { state = r; form(); } else form(r.error === 'network' || r.error === 'bad_response' ? '通信がうまくいきませんでした。もう一度お試しください。' : '登録できませんでした。');
   };
   $('#go').onclick = async () => {
     const ids = [...app.querySelectorAll('label.chk input:checked')].map(i => i.value);
