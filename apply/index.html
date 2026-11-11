@@ -91,6 +91,16 @@ function fail(msg, c) {
     <a class="btn line" href="${esc(talkUrl(c))}">LINEのトークで申し込む</a></div>`);
 }
 
+/* LINEとのつなぎこみが進まないとき */
+function stuck() {
+  const c = new URLSearchParams(location.search).get('c');
+  view(`<div class="card"><h2>うまく開けていないようです</h2>
+      <p class="sub">下のボタンから、もう一度開いてみてください。</p>
+      <p style="margin:12px 0 8px"><a class="btn line" href="${esc(LIFF_URL + (c ? '?c=' + encodeURIComponent(c) : ''))}">申込画面を開き直す</a></p>
+      <a class="btn sub" href="${esc(talkUrl(null))}">トークで申し込む</a>
+      <p class="note" style="margin-top:10px">（${esc(navigator.userAgent.slice(0, 160))}）</p></div>`);
+}
+
 /* 許可画面の前の説明（サイト・リッチメニューから来た人向け） */
 function intro() {
   const c = new URLSearchParams(location.search).get('c');
@@ -125,13 +135,22 @@ function openClasses() {
 (async () => {
   try {
     if (!API) return fail('申込画面の準備中です。');
+    loading('LINEとつないでいます…');
+    const slow = setTimeout(stuck, 15000);   // 15秒たっても進まないときは、開き直しの案内を出す
     await liff.init({ liffId: LIFF_ID });
+    clearTimeout(slow);
     if (!liff.isLoggedIn()) {
       // LINEの中（LIFF）で開いたときはそのままログイン。サイトなどから来たときは、許可画面の前に説明を出す
       if (liff.isInClient()) { liff.login({ redirectUri: location.href }); return; }
       return intro();
     }
     const tok = liff.getDecodedIDToken(); sub = tok && tok.sub || '';
+    // IDトークンの期限が切れていたら、ログインし直して新しいものをもらう
+    if (tok && tok.exp && tok.exp * 1000 < Date.now() + 60000) {
+      if (liff.isInClient()) return stuck();
+      liff.logout(); liff.login({ redirectUri: location.href }); return;
+    }
+    loading('ご家族の情報を確認しています…');
     const [cj, me] = await Promise.all([fetch('/data/classes.json?t=' + Date.now()).then(r => r.json()), api('me')]);
     classes = Array.isArray(cj) ? cj : cj.classes;
     const want = new URLSearchParams(location.search).get('c');
