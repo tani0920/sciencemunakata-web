@@ -233,6 +233,8 @@ function form(err = '') {
       <div class="row"><span>大人</span><span class="stepper"><button data-s="a-">−</button><output id="xa">${extra.a}</output><button data-s="a+">＋</button></span></div>
       <div class="row"><span>子ども</span><span class="stepper"><button data-s="k-">−</button><output id="xk">${extra.k}</output><button data-s="k+">＋</button></span></div>
       <label class="field" style="margin-top:12px"><span>連絡事項（任意）</span><textarea id="note" maxlength="300" placeholder="アレルギーや、遅れて来るなど"></textarea></label>
+      <div class="fee" id="fee"></div>
+      ${f.member ? '' : `<p class="note" style="margin:-6px 0 14px">🌱 会員になると、授業料が1回3,000円になります（年会費1,000円）。<a href="${esc(FORM_URL + '?usp=pp_url&' + FORM_LINE_ENTRY + '=' + encodeURIComponent(sub))}" target="_blank" rel="noopener">入会のご案内</a></p>`}
       <div class="err" id="ferr" hidden></div>
       <button class="btn line" id="go">この内容で申し込む</button>
       <p class="note" style="margin:10px 0 0">参加費は当日受付でお支払いください。くわしい集合場所や持ち物は、授業の前日までにLINEでご案内します。<br>申し込んだあとにキャンセルするときは、LINEのトークでご連絡ください。</p>
@@ -242,7 +244,26 @@ function form(err = '') {
     const [k, op] = [b.dataset.s[0], b.dataset.s[1]];
     extra[k] = Math.max(0, Math.min(10, extra[k] + (op === '+' ? 1 : -1)));
     $('#x' + k).value = extra[k]; $('#x' + k).textContent = extra[k];
+    showFee();
   });
+  /* 参加費のめやす（サーバーの計算と同じ決まり）。チェックや人数を変えるたびに出し直す */
+  const showFee = () => {
+    const ids = [...app.querySelectorAll('label.chk input:checked')].map(i => i.value);
+    const ck = kids.filter(m => ids.includes(m.id));
+    const pre = g => ['0〜2歳', '年少', '年中', '年長'].includes(g) || /歳/.test(g || '');
+    const school = ck.filter(m => !pre(m.grade)).length, preN = ck.length - school;
+    let html;
+    if (!school && !extra.k) html = preN ? '未就学のお子さまのみ（当日ご相談ください）' : 'お子さまにチェックすると表示されます';
+    else {
+      const total = (f.member ? 3000 : 4000) + Math.max(0, school - 2) * 500;
+      html = `<b>${total.toLocaleString()}円</b>（${f.member ? '会員' : '会員以外'}${school > 2 ? `・お子さま${school}人` : ''}）`;
+      if (preN) html += '<br><span class="note">未就学のお子さまは無料です</span>';
+      if (extra.k) html += '<br><span class="note">登録していないお子さまの分は、当日おうかがいします</span>';
+    }
+    $('#fee').innerHTML = `参加費のめやす：${html}`;
+  };
+  app.querySelectorAll('label.chk input').forEach(i => i.onchange = showFee);
+  showFee();
   $('#addm').onclick = () => { $('#addbox').hidden = !$('#addbox').hidden; };
   $('#ak').onchange = () => { const adult = $('#ak').value === '大人'; $('#agw').hidden = adult; $('#arw').hidden = !adult; };
   $('#asave').onclick = async () => {
