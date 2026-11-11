@@ -181,9 +181,10 @@
 <main>
   <!-- TAB 1: EVENT -->
   <section id="tab-event">
-    <div class="note">サイトからの自動取得はブラウザの制約でできないため、日時・タイトルは手入力です。</div>
     <div class="card">
       <h2>今回の授業の設定</h2>
+      <div style="margin-bottom:12px"><label>サイトの授業からえらぶ <span class="muted">（えらぶと開催日・授業No.・タイトルが入ります。手で直すこともできます）</span></label>
+        <select id="ev-pick"><option value="">読み込み中…</option></select></div>
       <div class="row">
         <div><label>開催日</label><input type="date" id="ev-date"></div>
         <div><label>授業No.（例：2607）</label><input id="ev-no" placeholder="2607"></div>
@@ -890,7 +891,7 @@ async function init(){
     date:todayISO(), no:'', title:'', mem:3000, non:4000, roster:[]
   };
   let persists=false; try{localStorage.setItem('__t','1');localStorage.removeItem('__t');persists=true;}catch(e){} document.getElementById('dbstat').textContent = persists? '保存OK（'+families.length+'家族 登録済）' : 'お試しモード（保存されません）';
-  loadEventForm(); loadIssuerForm(); addKidRow($('nf-kids')); renderAll(); renderHistory();
+  loadEventForm(); loadSiteClasses(); loadIssuerForm(); addKidRow($('nf-kids')); renderAll(); renderHistory();
   initFileSave();
 }
 
@@ -903,6 +904,34 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
 });
 
 // ---------- event tab ----------
+// ---------- サイトの授業一覧（/data/classes.json）から選ぶ ----------
+// アプリはサイトと同じ場所で動いているので、管理画面で登録した授業をそのまま読める
+let siteClasses=[];
+const WD='日月火水木金土';
+function classTitle(c){ return c.subtitle ? `${c.title} 〜${c.subtitle}〜` : c.title; }
+function classNo(c){ const [y,m]=c.date.split('-'); return y.slice(2)+m; }   // 例：2026-11 → 2611
+async function loadSiteClasses(){
+  const sel=$('ev-pick');
+  try{
+    const j=await (await fetch('/data/classes.json?t='+Date.now())).json();
+    siteClasses=(Array.isArray(j)?j:j.classes).filter(c=>c.status!=='中止').sort((a,b)=>b.date.localeCompare(a.date));
+  }catch(e){ sel.innerHTML='<option value="">読み込めませんでした（手で入れてください）</option>'; return; }
+  const today=todayISO();
+  const opt=c=>{ const [y,m,d]=c.date.split('-').map(Number); const w=WD[new Date(y,m-1,d).getDay()];
+    return `<option value="${esc(c.id)}">${y}/${m}/${d}（${w}）${esc(classTitle(c))}</option>`; };
+  const up=siteClasses.filter(c=>c.date>=today).reverse(), past=siteClasses.filter(c=>c.date<today);
+  sel.innerHTML='<option value="">えらんでください</option>'+
+    (up.length?'<optgroup label="これからの授業">'+up.map(opt).join('')+'</optgroup>':'')+
+    (past.length?'<optgroup label="これまでの授業">'+past.map(opt).join('')+'</optgroup>':'');
+  const cur=siteClasses.find(c=>c.date===current.date && (!current.title || current.title===classTitle(c) || current.title===c.title));
+  if(cur) sel.value=cur.id;
+}
+document.getElementById('ev-pick').onchange=()=>{
+  const c=siteClasses.find(x=>x.id===$('ev-pick').value); if(!c) return;
+  $('ev-date').value=c.date; $('ev-no').value=classNo(c); $('ev-title').value=classTitle(c);
+  $('ev-save').click();   // えらんだらそのまま保存
+};
+
 function loadEventForm(){
   $('ev-date').value=current.date; $('ev-no').value=current.no; $('ev-title').value=current.title;
   $('ev-mem').value=current.mem; $('ev-non').value=current.non;
