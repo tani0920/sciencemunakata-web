@@ -308,12 +308,12 @@
   function bigCard(c) {
     const d = fmtDate(c.date), st = statusOf(c);
     return `<button class="class-card reveal" data-cat="${esc(c.category)}" data-open="${esc(c.id)}">
-      <div class="cc-photo">${eyeHTML(c)}<span class="cc-icon" title="${esc(c.category)}">${catIcon(c.category)}</span></div>
+      <div class="cc-photo">${eyeHTML(c)}<span class="cc-icon" title="${esc(c.category)}">${catIcon(c.category)}</span>${st === '中止' ? '<span class="cc-cancel">中止になりました</span>' : ''}</div>
       <div class="cc-top"><div class="cc-date"><span class="cc-year">${d.y}年</span>${d.m}<small>月</small>${d.d}<small>日（${d.w}）</small></div><span class="cc-cat">${esc(c.category)}</span></div>
       <div class="cc-body">
         <div class="cc-title">${er(c.title)}</div>${c.subtitle ? `<p class="cc-sub">${er(c.subtitle)}</p>` : ''}
         <p class="cc-teacher">${esc(teacherLabel(c))}</p>
-        <div class="cc-foot">${!st ? '<span class="tag">申し込み受付中</span>' : ''}</div>
+        <div class="cc-foot">${!st ? '<span class="tag">申し込み受付中</span>' : st === '中止' ? '<span class="tag">中止になりました</span>' : ''}</div>
       </div>
     </button>`;
   }

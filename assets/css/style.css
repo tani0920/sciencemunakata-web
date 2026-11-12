@@ -1539,3 +1539,8 @@ img.dd { height: auto; pointer-events: none; filter: drop-shadow(0 3px 0 rgba(38
 .forenta .fr-meta { font-size: .85rem; font-weight: 700; }
 .forenta .fr-more { align-self: flex-end; font-weight: 900; color: var(--blue); font-size: .9rem; }
 @media (max-width: 600px) { .forenta { grid-template-columns: 1fr; } .forenta img { height: 160px; border-right: 0; border-bottom: 3px solid var(--ink); } .forenta .fr-body { padding: 14px 16px; } }
+
+/* これからの授業：中止になった回（日付が過ぎると「これまで」へ移る）2026-11-13 */
+.class-card .cc-photo { position: relative; }
+.cc-cancel { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%) rotate(-6deg); background: var(--ink); color: #fff; font-weight: 900; font-size: 1.3rem; letter-spacing: .08em; border: 3px solid #fff; border-radius: 12px; padding: .3em 1em; box-shadow: 0 4px 0 rgba(0,0,0,.25); white-space: nowrap; }
+.class-card:has(.cc-cancel) .cc-photo img { filter: grayscale(.6) brightness(.85); }
