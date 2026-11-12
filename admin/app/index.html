@@ -1907,7 +1907,7 @@ function rosterRows(){
     // 備考：この回の申込で書かれたこと＋今回来る大人（Excelでも「お母さん（山田花子）」のように備考に書いていた）
     const ad=attendAdults(r,f);
     const adultNote = ad&&ad.length ? '来る大人：'+ad.map(adultLabel).join('、') : '';
-    const applied=r.appliedAt||current.date, note=[r.note||f.note||'', adultNote].filter(Boolean).join(' ／ ');
+    const applied=r.appliedAt||current.date, note=[r.note||'', f.note?'家族メモ：'+f.note:'', adultNote].filter(Boolean).join(' ／ ');
     ks.forEach((k,i)=>{ n++;
       out.push([n, i===0?(f.member?'◯':''):'', i===0?applied:'',
         i===0?f.guardian:'付き添い', k.name, k.reading||'', k.gender, gradeNow(k),
@@ -2012,7 +2012,8 @@ function sheetHTML(){
     if(!people.length) people.push({kind:'',name:'',rd:'',gender:'',grade:''});
     const span=people.length;
     const why=[f.reason?'理由：'+f.reason:'', f.source?'きっかけ：'+f.source:''].filter(Boolean).map(esc).join('<br>');
-    const note=esc(r.note||f.note||'');
+    // この回の備考と、家族の備考（家族メモ）は別のもの。両方あれば両方出す（2026-11-12）
+    const note=[r.note?esc(r.note):'', f.note?'<b>家族メモ：</b>'+esc(f.note):''].filter(Boolean).join('<br>');
     people.forEach((q,i)=>{
       body+='<tr'+(i===0?' class="fam"':'')+'>'+
         (i===0?`<td class="c" rowspan="${span}"><span class="box"></span></td><td class="c" rowspan="${span}">${fno}</td><td class="c" rowspan="${span}">${mem?'◯':''}</td><td class="nw" rowspan="${span}"><b>${esc(f.guardian)}</b></td>`:'')+
