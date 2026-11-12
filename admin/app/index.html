@@ -133,7 +133,8 @@
   .sh-list .sm{font-size:8.5px;line-height:1.4;color:#333}
   /* 保護者・お子さまの名前は1行に（2026-11-12）。そのぶん理由・備考の文字を小さくして幅をゆずる */
   .sh-list .nw{white-space:nowrap}
-  .sh-list .rd{font-size:8.5px;color:#555;margin-left:2px}
+  .sh-list .rd{font-size:8.5px;color:#555}
+  .sh-list tr.fam td{border-top:1.5px solid #111}
   .sh-list .why{min-width:150px}.sh-list .memo{min-width:70px}
   .sh-sum{font-size:11px;margin:4px 0 0}
   .sheet ul{margin:0;padding-left:1.3em}.sheet li{margin:1px 0}
@@ -1854,7 +1855,7 @@ function renderRoster(){
   if(!rows.length){list.innerHTML='<div class="empty">「② 参加者を選ぶ・追加」から参加者を追加してください。</div>';
     document.getElementById('ro-summary').innerHTML='';return;}
   let total=0, kidsCount=0, adultCount=0, unknown=0;
-  let html='<table><thead><tr><th>保護者（宛名）</th><th>会員</th><th>お子さま</th><th>今回来る人</th><th>金額(税込)</th><th></th></tr></thead><tbody>';
+  let html='<table><thead><tr><th>保護者（宛名）</th><th>会員</th><th>お子さま</th><th>今回来る人</th><th>この回の備考</th><th>金額(税込)</th><th></th></tr></thead><tbody>';
   rows.forEach(({r,f})=>{
     const amt=amountFor(r,f); total+=amt; kidsCount+=attendKids(r,f).length;
     const ad=attendAdults(r,f); if(ad===null){ unknown++; adultCount+=1; } else adultCount+=ad.length;
@@ -1864,6 +1865,7 @@ function renderRoster(){
       <td><select data-id="${f.id}" class="row-mem"><option value="1"${mem?' selected':''}>会員</option><option value="0"${!mem?' selected':''}>非会員</option></select></td>
       <td class="kidline">${kidsLine(f)||'—'}</td>
       <td>${attendChipsHTML(r,f)}</td>
+      <td><textarea class="row-note" data-id="${f.id}" rows="2" style="min-width:150px;font-size:12px" placeholder="名簿の備考に出ます">${esc(r.note||'')}</textarea></td>
       <td><input type="number" class="row-amt" data-id="${f.id}" value="${amt}" style="width:90px"> <span class="muted">税抜${yen(floorNet(amt))}</span></td>
       <td><button class="btn ghost sm row-rm" data-id="${f.id}">外す</button></td>
     </tr>`;
@@ -1877,6 +1879,10 @@ function renderRoster(){
   list.querySelectorAll('.row-mem').forEach(s=>s.onchange=async()=>{
     const e=current.roster.find(r=>r.familyId===s.dataset.id); e.memberOverride=s.value==='1'; e.amountOverride='';
     await store.set(K.draft,JSON.stringify(current)); renderRoster();
+  });
+  list.querySelectorAll('.row-note').forEach(t=>t.onchange=async()=>{
+    const e=current.roster.find(r=>r.familyId===t.dataset.id); e.note=t.value.trim();
+    await store.set(K.draft,JSON.stringify(current)); toast('備考を保存しました');
   });
   list.querySelectorAll('.row-amt').forEach(inp=>inp.onchange=async()=>{
     const e=current.roster.find(r=>r.familyId===inp.dataset.id); e.amountOverride=inp.value;
@@ -1993,21 +1999,25 @@ function sheetHTML(){
   const rows=current.roster.map(r=>({r,f:families.find(x=>x.id===r.familyId)})).filter(x=>x.f);
   const c=thisClass();
   const time=c?[c.reception?'受付 '+c.reception:'', c.start?(c.start+(c.end?'〜'+c.end:'')):''].filter(Boolean).join('　'):'';
-  let kidsN=0, adultsN=0, total=0, body='', n=0;
-  rows.forEach(({r,f})=>{
+  // 来る人を1人1行で並べる（大人→子ども）。名前の下によみがな。人数の欄と同じ数の行になるので数えやすい（2026-11-12）
+  let kidsN=0, adultsN=0, total=0, body='', fno=0;
+  const nm=(name,rd)=>name?'<span class="nw">'+esc(name)+'</span>'+(rd?'<br><span class="rd">'+esc(rd)+'</span>':''):'—';
+  rows.forEach(({r,f})=>{ fno++;
     const mem=r.memberOverride!=null?r.memberOverride:f.member;
     const ks=attendKids(r,f), ad=attendAdults(r,f), amt=amountFor(r,f);
     kidsN+=ks.length; adultsN+=ad?ad.length:1; total+=amt;
-    const kk=ks.length?ks:[{name:'',reading:'',gender:'',grade:''}], span=kk.length;
+    const adults=ad?ad:[{relation:'',name:f.guardian,reading:''}];   // 来る大人が未記録なら、保護者1人として載せる
+    const people=[...adults.map(a=>({kind:a.relation||'大人',name:a.name,rd:a.reading,gender:'',grade:''})),
+                  ...ks.map(k=>({kind:'子',name:k.name,rd:k.reading,gender:k.gender||'',grade:gradeNow(k)||''}))];
+    if(!people.length) people.push({kind:'',name:'',rd:'',gender:'',grade:''});
+    const span=people.length;
     const why=[f.reason?'理由：'+f.reason:'', f.source?'きっかけ：'+f.source:''].filter(Boolean).map(esc).join('<br>');
-    const note=[r.note||f.note||'', ad&&ad.length?'来る大人：'+ad.map(adultLabel).join('、'):''].filter(Boolean).map(esc).join('<br>');
-    kk.forEach((k,i)=>{ n++;
-      const kid=k.name?esc(k.name)+(k.reading?'<span class="rd">（'+esc(k.reading)+'）</span>':''):'—';
-      body+='<tr>'+(i===0?`<td class="c" rowspan="${span}"><span class="box"></span></td>`:'')+
-        `<td class="c">${n}</td>`+
-        (i===0?`<td class="c" rowspan="${span}">${mem?'◯':''}</td><td class="nw" rowspan="${span}"><b>${esc(f.guardian)}</b></td>`:'')+
-        `<td class="nw">${kid}</td><td class="c">${esc(k.gender||'')}</td><td class="c">${esc(gradeNow(k)||'')}</td>`+
-        (i===0?`<td class="nw" rowspan="${span}">${esc(f.area||'')}</td><td rowspan="${span}" class="sm why">${why}</td><td rowspan="${span}" class="sm memo">${note}</td><td class="c" rowspan="${span}">${headCount(r,f)}</td><td class="r" rowspan="${span}">${yen(amt)}</td>`:'')+
+    const note=esc(r.note||f.note||'');
+    people.forEach((q,i)=>{
+      body+='<tr'+(i===0?' class="fam"':'')+'>'+
+        (i===0?`<td class="c" rowspan="${span}"><span class="box"></span></td><td class="c" rowspan="${span}">${fno}</td><td class="c" rowspan="${span}">${mem?'◯':''}</td><td class="nw" rowspan="${span}"><b>${esc(f.guardian)}</b></td>`:'')+
+        `<td class="c nw">${esc(q.kind)}</td><td>${nm(q.name,q.rd)}</td><td class="c">${esc(q.gender)}</td><td class="c">${esc(q.grade)}</td>`+
+        (i===0?`<td class="nw" rowspan="${span}">${esc(f.area||'')}</td><td rowspan="${span}" class="sm why">${why}</td><td rowspan="${span}" class="sm memo">${note}</td><td class="c" rowspan="${span}"><b>${headCount(r,f)}</b></td><td class="r" rowspan="${span}">${yen(amt)}</td>`:'')+
         '</tr>';
     });
   });
@@ -2023,7 +2033,7 @@ function sheetHTML(){
       ${c&&c.description?`<tr><th>概要</th><td>${esc(c.description)}</td></tr>`:''}
     </table>
     <h3>出席者</h3>
-    ${rows.length?`<table class="sh-list"><thead><tr><th>受付</th><th>No.</th><th>会員</th><th>保護者</th><th>お子さま</th><th>性別</th><th>学年</th><th>住まい</th><th>参加理由・きっかけ</th><th>備考</th><th>人数</th><th>金額</th></tr></thead><tbody>${body}</tbody></table>
+    ${rows.length?`<table class="sh-list"><thead><tr><th>受付</th><th>No.</th><th>会員</th><th>保護者（宛名）</th><th>続柄</th><th>来る人</th><th>性別</th><th>学年</th><th>住まい</th><th>参加理由・きっかけ</th><th>備考</th><th>人数</th><th>金額</th></tr></thead><tbody>${body}</tbody></table>
     <p class="sh-sum">家族 <b>${rows.length}</b> 組　／　大人 <b>${adultsN}</b> 人　／　お子さま <b>${kidsN}</b> 人　／　合計 <b>${yen(total)}</b></p>`:'<p>（まだ参加者がいません）</p>'}
     <h3>注意事項</h3>${li(notes)}
     <h3>授業の最初のアナウンス</h3>${li(lines(annOpen()).map(x=>x.replace(/\{次回\}/g,nx)))}
