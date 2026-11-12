@@ -454,8 +454,8 @@
 
   /* ───── あそぶ ───── */
   // ゲームの特長のしるし（site.json の games[].tags）
-  const GAME_TAG = { free: '無料', browser: 'ダウンロードなし', tablet: 'タブレットおすすめ' };
-  const gameTags = tags => (tags || []).length ? `<ul class="g-tags">${tags.filter(t => GAME_TAG[t]).map(t => `<li class="gt-${t}">${uiIcon(t)}${GAME_TAG[t]}</li>`).join('')}</ul>` : '';
+  const GAME_TAG = { free: '無料', browser: 'ダウンロードなし', tablet: 'お子さまはタブレットで' };
+  const gameTags = tags => (tags || []).length ? `<ul class="g-tags">${tags.filter(t => GAME_TAG[t]).map(t => `<li>${uiIcon(t)}${GAME_TAG[t]}</li>`).join('')}</ul>` : '';
   function renderGames() {
     $('#gameGrid').innerHTML = (SITE.games || []).map(g => {
       const open = g.status === 'open' && g.url;
