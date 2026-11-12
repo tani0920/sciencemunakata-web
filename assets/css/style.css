@@ -555,6 +555,12 @@ p { margin: 0 0 1em; }
 .game h3 { font-family: var(--pop); font-weight: 400; font-size: 1.15rem; margin-bottom: 6px; }
 .game p { color: var(--ink-2); font-size: .9rem; flex: 1; }
 .game .btn { width: 100%; }
+.g-tags { list-style: none; padding: 0; margin: 12px 0 16px; display: flex; flex-wrap: wrap; gap: 6px; }
+.g-tags li { display: inline-flex; align-items: center; gap: .3em; font-size: .78rem; font-weight: 900; line-height: 1; padding: .45em .8em .45em .55em; border: 2px solid var(--ink); border-radius: 999px; background: #fff; }
+.g-tags .ic { width: 1.3em; height: 1.3em; stroke-width: 3.6; vertical-align: 0; }
+.g-tags .gt-free { background: var(--pink-l); color: var(--pink); border-color: var(--pink); }
+.g-tags .gt-browser { background: var(--teal-l); color: var(--teal); border-color: var(--teal); }
+.g-tags .gt-tablet { background: var(--blue-l); color: var(--blue); border-color: var(--blue); }
 .game.soon .g-img img { filter: saturate(.7); }
 .game.soon .btn { background: #E7EAF1; color: var(--ink-2); box-shadow: 0 5px 0 var(--ink-2); border-color: var(--ink-2); cursor: default; transform: none; }
 .ribbon { position: absolute; z-index: 2; right: -36px; top: 18px; transform: rotate(35deg); background: var(--pink); color: #fff; font-weight: 900; font-size: .78rem; padding: .2em 3em; }

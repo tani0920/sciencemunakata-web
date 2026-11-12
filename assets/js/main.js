@@ -453,6 +453,9 @@
   }
 
   /* ───── あそぶ ───── */
+  // ゲームの特長のしるし（site.json の games[].tags）
+  const GAME_TAG = { free: '無料', browser: 'ダウンロードなし', tablet: 'タブレットおすすめ' };
+  const gameTags = tags => (tags || []).length ? `<ul class="g-tags">${tags.filter(t => GAME_TAG[t]).map(t => `<li class="gt-${t}">${uiIcon(t)}${GAME_TAG[t]}</li>`).join('')}</ul>` : '';
   function renderGames() {
     $('#gameGrid').innerHTML = (SITE.games || []).map(g => {
       const open = g.status === 'open' && g.url;
@@ -463,6 +466,7 @@
         ${g.badge ? `<span class="g-badge">${uiIcon('star')}${er(g.badge)}</span>` : ''}
         ${open ? `<a href="${esc(g.url)}" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">${visual}</a>` : visual}
         <div class="g-body"><h3>${er(g.title)}</h3><p>${er(g.desc)}</p>
+        ${gameTags(g.tags)}
         <div class="g-btns">${g.page ? `<a class="btn btn-sub g-info" href="${esc(g.page)}">ゲームの内容</a>` : ''}
         ${open ? `<a class="btn btn-main" href="${esc(g.url)}" target="_blank" rel="noopener">あそぶ ▶</a>` : '<span class="btn">もうすぐ公開</span>'}</div></div>
       </article>`;

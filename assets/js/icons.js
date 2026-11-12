@@ -46,6 +46,9 @@
     home: '<path d="M6 22L24 7l18 15"/><path d="M11 18v22h26V18"/><path d="M20 40V29h8v11"/>',
     work: '<rect x="5" y="15" width="38" height="25" rx="5"/><path d="M17 15v-4a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v4M5 26h38"/>',
     history: '<circle cx="24" cy="24" r="17"/><path d="M24 14v10l7 5"/>',
+    free: '<path d="M24 6a18 18 0 1 1-.01 0z"/><path d="M17 13l7 10 7-10M24 23v13M18 26h12M18 31h12"/>',
+    browser: '<rect x="5" y="9" width="38" height="30" rx="5"/><path d="M5 17h38M10 13h1M14 13h1"/><path d="M20 23v11l9-5.5z"/>',
+    tablet: '<rect x="10" y="5" width="28" height="38" rx="5"/><path d="M20 37h8"/>',
   };
   UI_ICON.classes = ICON_PATHS['かがく'];
   // GPTでつくった絵のアイコン（assets/img/icons/<名前>.webp）。ここにない名前は線画を使う

@@ -33,7 +33,12 @@
    "status": "open",
    "chara": "teal-4",
    "image": "assets/img/games/mushitori.webp",
-   "page": "mushitori/"
+   "page": "mushitori/",
+   "tags": [
+    "free",
+    "browser",
+    "tablet"
+   ]
   },
   {
    "title": "むなかた虫そだて日記",
@@ -41,7 +46,12 @@
    "url": "",
    "status": "soon",
    "chara": "pink-5",
-   "image": "assets/img/games/mushisodate.webp"
+   "image": "assets/img/games/mushisodate.webp",
+   "tags": [
+    "free",
+    "browser",
+    "tablet"
+   ]
   },
   {
    "title": "里山ラボ サイエンスアプリ",
@@ -49,7 +59,12 @@
    "badge": "会員限定",
    "url": "",
    "status": "soon",
-   "chara": "blue-3"
+   "chara": "blue-3",
+   "tags": [
+    "free",
+    "browser",
+    "tablet"
+   ]
   }
  ],
  "sns": [
