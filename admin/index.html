@@ -469,6 +469,11 @@ function editClass(id) {
     <label class="f">授業の内容</label><textarea id="description" rows="6">${esc(c.description)}</textarea>
     <label class="f">注意・持ち物など<small>1行に1つ</small></label><textarea id="notes" rows="4">${esc((c.notes || []).join('\n'))}</textarea>
     <label class="check"><input type="checkbox" id="stop"${c.status === '中止' ? ' checked' : ''}> 中止になった（サイトに「中止になりました」と出ます）</label>
+    <h3 style="margin:26px 0 0;font-size:16px">授業のあとのアンケート</h3>
+    <p class="hint" style="margin:6px 0 0">毎回同じ質問（満足度・また参加したいか・感想）と、お子さまの「なぜ？」は自動で入ります。ここには<b>この回だけ聞きたいこと</b>を1つ書けます（空なら出しません）。</p>
+    <label class="f">この回だけの質問</label><input type="text" id="svq" value="${esc((c.survey && c.survey.q) || '')}" placeholder="例：はじめての夜の授業でした。時間帯や長さはいかがでしたか？">
+    <label class="f">答えの選択肢<small>1行に1つ。「その他」で始まる選択肢には書く欄がつきます。空なら自由に書く欄になります</small></label><textarea id="svc" rows="4">${esc(((c.survey && c.survey.choices) || []).join('\n'))}</textarea>
+    ${id ? `<label class="f">アンケートのURL<small>授業のあと、LINEでこのURLを送ります</small></label><div style="display:flex;gap:8px;align-items:center"><input type="text" id="svurl" readonly value="https://liff.line.me/2012556501-FSv5hUHg/survey/?c=${esc(id)}"><button type="button" class="btn small" id="svcopy" style="flex:none">コピー</button></div>` : ''}
     <h3 style="margin:26px 0 0;font-size:16px">写真</h3>
     <label class="f">告知画像（アイキャッチ）<small>Instagram・LINEで使った縦長の画像（4:5）</small></label><div id="eye"></div>
     <label class="f">表紙の写真<small>横長 4:3 に切り抜きます。授業のあとに当日の写真へ差し替えると◎</small></label><div id="photo"></div>
@@ -482,6 +487,7 @@ function editClass(id) {
   const getEye = imgField($('#eye'), { paths: c.eyecatch ? [c.eyecatch] : [], dir: () => 'classes', base: () => cid() + '-eye', opt: { w: 640, h: 800 }, cls: 'tall' });
   const getPhoto = imgField($('#photo'), { paths: c.photo ? [c.photo] : [], dir: () => 'classes', base: cid, opt: { w: 800, h: 600 } });
   const getGal = imgField($('#gallery'), { paths: c.gallery, many: true, dir: () => 'classes', base: () => cid() + '-g', opt: { max: 1200 } });
+  if ($('#svcopy')) $('#svcopy').onclick = async () => { try { await navigator.clipboard.writeText($('#svurl').value); toast('アンケートのURLをコピーしました'); } catch (e) { $('#svurl').select(); } };
   $('#video').addEventListener('input', () => { if (isShortUrl(val('video'))) $('#short').checked = true; });
   formActions(() => {
     if (!val('date')) return toast('日付を入れてください', true);
@@ -496,6 +502,7 @@ function editClass(id) {
       videoId: vid, photo: getPhoto()[0] || '', eyecatch: getEye()[0] || '', photoType: $('#real').checked ? 'photo' : 'illust', gallery: getGal(),
     };
     if ($('#short').checked) item.videoShort = true; else delete item.videoShort;
+    if (val('svq')) item.survey = { q: val('svq'), choices: lines($('#svc').value) }; else delete item.survey;
     if (val('teacherText') && !item.teacher) item.teacherText = val('teacherText'); else delete item.teacherText;
     save('classes', list => id ? list.map(x => x.id === id ? item : x) : [item, ...list], `授業：${item.date} ${item.title}`);
   }, id && (() => { if (confirm(`「${c.title}」を削除します。中止の授業は削除せず「中止になった」にチェックでもOKです。削除しますか？`)) save('classes', list => list.filter(x => x.id !== id), `授業を削除：${c.title}`); }));

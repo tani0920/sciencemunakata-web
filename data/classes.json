@@ -21,7 +21,16 @@
     "photo": "assets/img/classes/2026-11-14-lighttrap.webp",
     "eyecatch": "assets/img/classes/2026-11-14-lighttrap-eye.webp",
     "photoType": "illust",
-    "gallery": []
+    "gallery": [],
+    "survey": {
+      "q": "はじめての夜の授業でした。時間帯や長さはいかがでしたか？",
+      "choices": [
+        "ちょうどよかった",
+        "もう少し早い時間がいい",
+        "短いほうがいい",
+        "その他"
+      ]
+    }
   },
   {
     "id": "2026-07-18-take",

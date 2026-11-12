@@ -306,6 +306,18 @@
 
   <!-- TAB 4: DATA / SETTINGS -->
   <section id="tab-data" class="hidden">
+    <div class="card" style="border-color:var(--teal)">
+      <h2>📝 授業アンケートの回答</h2>
+      <p class="muted" style="margin:0 0 8px">LINEのアンケート（授業のあとに送るもの）の回答を読み込みます。読むには「② → 管理用のカギ」と同じカギを使います。</p>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button class="btn sm" id="sv-load" style="background:var(--teal);color:#fff;border-color:var(--teal)">回答を読み込む</button>
+        <select id="sv-class" style="max-width:340px" hidden></select>
+        <button class="btn ghost sm" id="sv-csv" hidden>CSV</button>
+        <span class="muted" id="sv-stat"></span>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="muted">今回の授業のアンケートURL：</span><input id="sv-url" readonly style="flex:1;min-width:240px;font-size:12px"><button class="btn ghost sm" id="sv-urlcopy">コピー</button></div>
+      <div id="sv-out" style="margin-top:12px"></div>
+    </div>
     <div class="card">
       <h2>発行者情報（領収書に印字）</h2>
       <div class="row">
@@ -943,7 +955,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
   b.classList.add('active');
   ['event','pick','roster','data'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('hidden', t!==b.dataset.tab));
-  if(b.dataset.tab==='data') renderHistory();
+  if(b.dataset.tab==='data'){ renderHistory(); showSurveyUrl(); }
 });
 
 // ---------- event tab ----------
@@ -1970,6 +1982,58 @@ function receiptsHTML(){
   });
   return html;
 }
+
+// ---------- 授業アンケートの回答（2026-11-12）----------
+// 回答は GAS の「アンケート」シートにたまる。ここでは読み込んで、授業ごとにまとめて見る
+const SURVEY_LIFF='https://liff.line.me/2012556501-FSv5hUHg/survey/';
+let surveyRows=[];
+function surveyUrl(){ const c=thisClass(); return c? SURVEY_LIFF+'?c='+encodeURIComponent(c.id) : ''; }
+function showSurveyUrl(){ const u=surveyUrl(); $('sv-url').value=u||'（①で授業をえらぶと出ます）'; }
+$('sv-urlcopy').onclick=async()=>{ const u=surveyUrl(); if(!u) return toast('①で授業をえらんでください'); try{ await navigator.clipboard.writeText(u); toast('アンケートのURLをコピーしました'); }catch(e){ $('sv-url').select(); } };
+$('sv-load').onclick=async()=>{
+  if(!spKey()) return askKey(()=>$('sv-load').click());
+  $('sv-stat').textContent='読み込んでいます…';
+  let r; try{ r=JSON.parse(await (await fetch(SP_API,{method:'POST',body:JSON.stringify({action:'admin',key:spKey(),op:'surveyExport'})})).text()); }catch(e){ r={ok:false,error:'network'}; }
+  if(!r.ok){ $('sv-stat').textContent=''; if(r.error==='auth') return askKey(()=>$('sv-load').click()); return toast(r.error==='unknown_op'?'Apps Script を新しい版で公開し直してください':'読み込めませんでした'); }
+  surveyRows=r.rows||[];
+  const ids=[...new Set(surveyRows.map(x=>x['授業ID']))];
+  const lab=id=>(surveyRows.find(x=>x['授業ID']===id)||{})['授業']||id;
+  const sel=$('sv-class'); sel.hidden=!ids.length; $('sv-csv').hidden=!ids.length;
+  sel.innerHTML='<option value="">すべての授業</option>'+ids.sort().reverse().map(id=>`<option value="${esc(id)}">${esc(lab(id))}</option>`).join('');
+  const c=thisClass(); if(c&&ids.includes(c.id)) sel.value=c.id;
+  $('sv-stat').textContent='回答 '+surveyRows.length+' 件';
+  renderSurvey();
+};
+$('sv-class').onchange=renderSurvey;
+function renderSurvey(){
+  const id=$('sv-class').value, rows=surveyRows.filter(x=>!id||x['授業ID']===id);
+  if(!rows.length){ $('sv-out').innerHTML='<div class="empty">まだ回答がありません。</div>'; return; }
+  const ids=[...new Set(rows.map(x=>x['授業ID']))];
+  // 授業ごとの数字
+  let html='<table><thead><tr><th>授業</th><th>回答</th><th>満足度</th><th>また参加したい</th></tr></thead><tbody>'+ids.map(cid=>{
+    const g=rows.filter(x=>x['授業ID']===cid), st=g.map(x=>Number(x['満足度'])||0).filter(Boolean);
+    const avg=st.length?(st.reduce((a,b)=>a+b,0)/st.length).toFixed(1):'—';
+    const cnt={}; g.forEach(x=>{ const a=x['また参加したい']||'（なし）'; cnt[a]=(cnt[a]||0)+1; });
+    return `<tr><td>${esc(g[0]['授業'])}</td><td>${g.length}</td><td><b>★${avg}</b></td><td style="font-size:12px">${Object.entries(cnt).map(([k,v])=>esc(k)+' '+v).join('<br>')}</td></tr>`;
+  }).join('')+'</tbody></table>';
+  // その回だけの質問の答え
+  const qs=[...new Set(rows.filter(x=>x['その回の質問']).map(x=>x['その回の質問']))];
+  qs.forEach(q=>{ const cnt={}; rows.filter(x=>x['その回の質問']===q).forEach(x=>{ const a=x['その回の答え']||'（なし）'; cnt[a]=(cnt[a]||0)+1; });
+    html+=`<h3 style="font-size:14px;margin:14px 0 4px">Q. ${esc(q)}</h3><ul style="margin:0;padding-left:1.2em;font-size:13px">${Object.entries(cnt).map(([k,v])=>`<li>${esc(k)}　<b>${v}</b></li>`).join('')}</ul>`; });
+  // 感想
+  const cm=rows.filter(x=>x['感想']);
+  html+=`<h3 style="font-size:14px;margin:14px 0 4px">ひとこと感想（${cm.length}）</h3>`+(cm.length?cm.map(x=>`<div class="famcard" style="display:block"><div style="font-size:12px" class="muted">${esc(x['保護者名']||x['LINE表示名']||'')}　★${esc(x['満足度'])}${ids.length>1?'　'+esc(x['授業']):''}${x['紹介OK']==='OK'?'　<span style="color:var(--teal);font-weight:900">紹介OK</span>':''}</div><div style="white-space:pre-wrap">${esc(x['感想'])}</div></div>`).join(''):'<div class="muted">なし</div>');
+  // なぜ？
+  const wy=rows.filter(x=>x['なぜ？']);
+  html+=`<h3 style="font-size:14px;margin:14px 0 4px">お子さんの「なぜ？」（${wy.length}家族）</h3>`+(wy.length?'<ul style="margin:0;padding-left:1.2em">'+wy.map(x=>String(x['なぜ？']).split('\n').filter(Boolean).map(l=>`<li style="white-space:pre-wrap">${esc(l)}</li>`).join('')).join('')+'</ul>':'<div class="muted">なし</div>');
+  $('sv-out').innerHTML=html;
+}
+$('sv-csv').onclick=()=>{
+  const id=$('sv-class').value, rows=surveyRows.filter(x=>!id||x['授業ID']===id);
+  const head=['回答日時','授業','保護者名','LINE表示名','満足度','また参加したい','感想','その回の質問','その回の答え','なぜ？','紹介OK','答え直し'];
+  const csv='﻿'+[head,...rows.map(x=>head.map(h=>x[h]))].map(r=>r.map(c=>{c=(c==null?'':String(c));return /[",\n\r]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c;}).join(',')).join('\r\n');
+  dl(csv,'アンケート_'+(id||'すべて')+'.csv','text/csv'); toast('CSVを書き出しました');
+};
 
 // ---------- 授業の名簿シート（2026-11-12）----------
 // Excel の「〇〇授業応募者」シートと同じ中身：授業の概要・出席者・注意事項・最初と最後のアナウンス。

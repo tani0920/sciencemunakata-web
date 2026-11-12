@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>授業のふりかえりアンケート｜サイエンス里山ラボ宗像</title>
+<link rel="icon" href="/assets/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root { --blue:#3B6FC1; --blue-l:#E6EEFB; --teal:#1FAFAA; --teal-l:#DDF5F3; --pink:#E6336F; --pink-l:#FDE6EE; --leaf:#5DB63E; --sun:#FFC53D; --sun-l:#FFF3CF;
+    --ink:#26314D; --ink-2:#56607A; --paper:#FFFBF1; --line:#06C755; --line-d:#04A345; --grid:rgba(59,111,193,.075); }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif; font-weight: 500; color: var(--ink);
+    line-height: 1.7; background: var(--paper); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 24px 24px; -webkit-text-size-adjust: 100%; }
+  main { max-width: 520px; margin: 0 auto; padding: 18px 16px calc(40px + env(safe-area-inset-bottom)); }
+  .logo { display: block; width: 168px; margin: 4px auto 14px; }
+  .card { background: #fff; border: 3px solid var(--ink); border-radius: 22px; padding: 18px 18px 20px; margin: 0 0 16px; box-shadow: 0 4px 0 rgba(38,49,77,.12); }
+  .card.kid { background: var(--sun-l); }
+  h1 { font-size: 21px; line-height: 1.45; margin: 0 0 4px; font-weight: 900; }
+  h2 { font-size: 16px; margin: 0 0 10px; font-weight: 900; }
+  .q { display: flex; gap: 8px; align-items: baseline; }
+  .q i { font-style: normal; flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 13px; display: grid; place-items: center; transform: translateY(-1px); }
+  .sub { color: var(--ink-2); font-size: 14px; margin: 0; }
+  .pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 10px; border-radius: 99px; background: var(--teal-l); color: #137C78; margin-bottom: 6px; }
+  .stars { display: flex; justify-content: center; gap: 4px; margin: 6px 0 2px; }
+  .stars button { background: none; border: 0; padding: 2px; font-size: 40px; line-height: 1; color: #D5DAE5; cursor: pointer; transition: transform .1s; }
+  .stars button.on { color: var(--sun); text-shadow: 0 2px 0 #E0A21A; }
+  .stars button:active { transform: scale(.9); }
+  .starlabel { text-align: center; font-size: 13px; color: var(--ink-2); min-height: 1.7em; margin: 0; }
+  label.opt { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border: 2px solid #E3E6EE; border-radius: 14px; margin: 0 0 8px; cursor: pointer; background: #fff; }
+  label.opt:has(input:checked) { border-color: var(--blue); background: var(--blue-l); }
+  label.opt input { width: 22px; height: 22px; accent-color: var(--blue); flex: none; margin: 0; }
+  input[type=text], textarea { width: 100%; font: inherit; font-size: 16px; color: var(--ink); padding: 10px 12px; border: 2px solid #D5DAE5; border-radius: 12px; background: #fff; }
+  textarea { min-height: 84px; resize: vertical; }
+  .field { display: block; margin: 0 0 12px; }
+  .field > span { display: block; font-size: 14px; font-weight: 700; margin: 0 0 4px; }
+  .why-chara { float: right; width: 74px; margin: -6px -4px 0 6px; }
+  .btn { display: flex; width: 100%; align-items: center; justify-content: center; gap: 8px; border: 3px solid var(--ink); border-radius: 999px; padding: 13px 18px;
+    font: inherit; font-size: 17px; font-weight: 900; color: var(--ink); background: var(--sun); box-shadow: 0 4px 0 var(--ink); text-decoration: none; cursor: pointer; }
+  .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+  .btn.line { background: var(--line); color: #fff; border-color: var(--line-d); box-shadow: 0 4px 0 var(--line-d); }
+  .btn.sub { background: #fff; font-size: 15px; padding: 10px 16px; }
+  .note { font-size: 13px; color: var(--ink-2); }
+  .err { background: var(--pink-l); color: #A3184A; border-radius: 12px; padding: 10px 14px; margin: 10px 0; font-weight: 700; }
+  .done { text-align: center; }
+  .done img { width: 150px; margin: 4px auto 8px; display: block; }
+  .sum { text-align: left; background: var(--sun-l); border-radius: 14px; padding: 12px 14px; margin: 12px 0; }
+  .cls { display: block; text-align: left; width: 100%; border: 2px solid #E3E6EE; border-radius: 14px; padding: 12px 14px; margin: 0 0 8px; background: #fff; font: inherit; color: var(--ink); cursor: pointer; }
+  .cls b { display: block; font-size: 16px; }
+  .loading { text-align: center; padding: 40px 0; color: var(--ink-2); }
+  .spin { width: 34px; height: 34px; border: 4px solid var(--blue-l); border-top-color: var(--blue); border-radius: 50%; margin: 0 auto 10px; animation: s 1s linear infinite; }
+  @keyframes s { to { transform: rotate(360deg); } }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <img class="logo" src="/assets/img/logo-color.webp" alt="サイエンス里山ラボ宗像">
+  <div id="app"><div class="loading"><div class="spin"></div>読み込んでいます…</div></div>
+</main>
+<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script>
+/* 授業のあとのアンケート（2026-11-12）
+   LINEの中で開く（申込画面と同じ LIFF。https://liff.line.me/<LIFF_ID>/survey/?c=<授業ID> で、この画面が開く）。
+   質問は「毎回同じ3つ」＋「その回だけの1つ（classes.json の survey）」＋「お子さまの『なぜ？』」＋「紹介してよいか」。
+   回答は申込と同じスプレッドシートの「アンケート」シートにたまる */
+const LIFF_ID = '2012556501-FSv5hUHg';
+const API = 'https://script.google.com/macros/s/AKfycbxwrWoj9COdfvQTA8FFcYHzIxQurQJBEolSC26waR95pSui8ptOgZt_Z-cKKNqw6tVN/exec';
+const LIFF_URL = 'https://liff.line.me/' + LIFF_ID + '/survey/';
+const AGAIN = ['ぜひ参加したい', 'テーマによって参加したい', 'たぶん参加しない'];
+const STAR_TEXT = ['', 'いまひとつ', 'もう少し', 'ふつう', 'よかった', 'とてもよかった！'];
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const app = $('#app');
+const paramC = () => new URLSearchParams(location.search).get('c');
+let classes = [], cls = null, me = null;
+
+function view(html) { app.innerHTML = html; window.scrollTo(0, 0); }
+function loading(msg = '読み込んでいます…') { view(`<div class="loading"><div class="spin"></div>${esc(msg)}</div>`); }
+function fail(msg) { view(`<div class="card"><h2>うまく開けませんでした</h2><p>${esc(msg)}</p><p class="note">おそれいりますが、時間をおいてもう一度開いてください。</p></div>`); }
+function label(c) {
+  const [y, m, d] = c.date.split('-').map(Number);
+  return `${m}/${d}（${'日月火水木金土'[new Date(y, m - 1, d).getDay()]}）${c.title}`;
+}
+const today = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+// 答えられる授業：もう終わった授業（中止でないもの）
+const doneClasses = () => classes.filter(c => (DEMO || c.date <= today()) && c.status !== '中止').sort((a, b) => b.date.localeCompare(a.date));
+
+/* 見本モード（?demo=1）：画面の確認用。LINEにもサーバーにもつながない */
+const DEMO = new URLSearchParams(location.search).get('demo') === '1';
+const DEMO_ME = { ok: true, linked: true, familyName: '里山 はじめ', kids: [{ id: 'd1', name: '里山 そら', grade: '小3' }, { id: 'd2', name: '里山 こはる', grade: '年中' }], prev: null };
+
+async function api(action, body = {}) {
+  if (DEMO) return action === 'surveyMe' ? DEMO_ME : { ok: true, id: 'demo' };
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 30000);
+  try {
+    const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action, idToken: liff.getIDToken(), ...body }), signal: ctl.signal });
+    const t = await r.text();
+    try { return JSON.parse(t); } catch (_) { return { ok: false, error: 'bad_response' }; }
+  } catch (e) { return { ok: false, error: 'network' }; } finally { clearTimeout(timer); }
+}
+
+/* LINEの外で開いたとき：LINEで開き直してもらう */
+function openInLine() {
+  const url = LIFF_URL + (paramC() ? '?c=' + encodeURIComponent(paramC()) : '');
+  view(`<div class="card" style="text-align:center"><h2>LINEで開いてください</h2>
+    <p style="text-align:left">このアンケートは、スマートフォンのLINEの中で開きます。</p>
+    <a class="btn line" href="${esc(url)}">LINEでアンケートを開く</a></div>`);
+}
+
+(async () => {
+  try {
+    const cjP = fetch('/data/classes.json?t=' + Date.now()).then(r => r.json());
+    if (!DEMO) {
+      loading('LINEとつないでいます…');
+      await liff.init({ liffId: LIFF_ID });
+      if (!liff.isLoggedIn()) {
+        if (liff.isInClient()) { liff.login({ redirectUri: location.href }); return; }
+        return openInLine();
+      }
+      const tok = liff.getDecodedIDToken();
+      if (tok && tok.exp && tok.exp * 1000 < Date.now() + 60000) {
+        if (liff.isInClient()) return fail('LINEの確認の期限が切れました。トークの画面に戻って、もう一度開いてください。');
+        liff.logout(); liff.login({ redirectUri: location.href }); return;
+      }
+    }
+    const cj = await cjP;
+    classes = Array.isArray(cj) ? cj : cj.classes;
+    const list = doneClasses();
+    cls = list.find(c => c.id === paramC()) || null;
+    if (!cls && paramC() && classes.some(c => c.id === paramC())) {
+      return view(`<div class="card"><h2>この授業のアンケートは、授業のあとに開きます</h2><p class="sub">授業が終わったら、またこの画面を開いてください🌱</p></div>`);
+    }
+    if (!cls) return pickClass(list.slice(0, 5));
+    start();
+  } catch (e) { console.error(e); fail('通信がうまくいきませんでした。'); }
+})();
+
+function pickClass(list) {
+  if (!list.length) return view(`<div class="card"><h2>アンケートの授業がありません</h2></div>`);
+  view(`<div class="card"><h2>どの授業のアンケートですか？</h2>
+    ${list.map(c => `<button class="cls" data-id="${esc(c.id)}"><b>${esc(label(c))}</b>${c.subtitle ? `<span class="note">${esc(c.subtitle)}</span>` : ''}</button>`).join('')}</div>`);
+  app.querySelectorAll('.cls').forEach(b => b.onclick = () => { cls = classes.find(c => c.id === b.dataset.id); start(); });
+}
+
+async function start() {
+  loading('準備しています…');
+  me = await api('surveyMe', { classId: cls.id });
+  if (!me.ok) return fail(me.error === 'auth' ? 'LINEの確認ができませんでした。もう一度開き直してください。' : '時間をおいて、もう一度お試しください。');
+  form();
+}
+
+/* ───── アンケート ───── */
+function form(err = '') {
+  const p = me.prev || {};
+  const sv = cls.survey && cls.survey.q ? cls.survey : null;
+  const choices = sv && (sv.choices || []).length ? sv.choices : null;
+  const hasOther = choices && choices.some(x => /^その他/.test(x));
+  // 前に答えた「なぜ？」（「名前：内容」の行）を、お子さまごとに戻す
+  const prevWhy = {}; String(p.whys || '').split('\n').forEach(l => { const m = l.match(/^(.+?)：(.*)$/); if (m) prevWhy[m[1]] = m[2]; else if (l) prevWhy[''] = l; });
+  const kids = me.kids || [];
+  view(`<div class="card"><span class="pill">授業のふりかえり</span>
+      <h1>${esc(label(cls))}</h1>${cls.subtitle ? `<p class="sub">${esc(cls.subtitle)}</p>` : ''}
+      <p class="note" style="margin:8px 0 0">${me.prev ? 'お答えいただいた内容を直せます。送り直すと、新しい内容に変わります。' : '参加ありがとうございました！1分ほどで終わります。'}</p></div>
+    ${err ? `<div class="err">${esc(err)}</div>` : ''}
+    ${me.linked ? '' : `<div class="card"><label class="field" style="margin:0"><span>保護者のお名前</span><input type="text" id="nm" value="${esc(p.name || '')}" placeholder="例：里山 花子"></label></div>`}
+    <div class="card">
+      <h2 class="q"><i>1</i>今日の授業はいかがでしたか？</h2>
+      <div class="stars" id="stars">${[1, 2, 3, 4, 5].map(n => `<button type="button" data-n="${n}" aria-label="${n}">★</button>`).join('')}</div>
+      <p class="starlabel" id="starlabel"></p>
+    </div>
+    <div class="card">
+      <h2 class="q"><i>2</i>また参加したいですか？</h2>
+      ${AGAIN.map(a => `<label class="opt"><input type="radio" name="again" value="${esc(a)}"${p.again === a ? ' checked' : ''}>${esc(a)}</label>`).join('')}
+    </div>
+    <div class="card">
+      <h2 class="q"><i>3</i>ひとこと感想<span class="note" style="font-weight:500">（任意）</span></h2>
+      <textarea id="comment" maxlength="1000" placeholder="楽しかったこと、気づいたこと、先生へのメッセージなど">${esc(p.comment || '')}</textarea>
+    </div>
+    ${sv ? `<div class="card">
+      <h2 class="q"><i>4</i>${esc(sv.q)}</h2>
+      ${choices ? choices.map(c => `<label class="opt"><input type="radio" name="ans" value="${esc(c)}"${p.answer === c || (String(p.answer || '').indexOf(c + '：') === 0) ? ' checked' : ''}>${esc(c)}</label>`).join('') +
+        (hasOther ? `<input type="text" id="other" placeholder="「その他」の内容" style="margin-top:2px" value="${esc((String(p.answer || '').match(/^その他.*?：(.*)$/) || [])[1] || '')}">` : '')
+        : `<textarea id="ans" maxlength="300">${esc(p.answer || '')}</textarea>`}
+    </div>` : ''}
+    <div class="card kid"><img class="why-chara" src="/assets/img/chara/pink-5.webp" alt="">
+      <h2 class="q"><i>${sv ? 5 : 4}</i>きょう見つけた「なぜ？」を書いてね</h2>
+      <p class="note" style="margin:0 0 10px">お子さんといっしょに書いてください（任意）。先生や里山ラボが答えて、LINEやInstagramで紹介することがあります。</p>
+      ${kids.length ? kids.map(k => `<label class="field"><span>${esc(k.name)}さんの「なぜ？」</span><textarea class="why" data-name="${esc(k.name)}" maxlength="300" placeholder="例：どうして虫は光に集まるの？">${esc(prevWhy[k.name] || '')}</textarea></label>`).join('')
+        : `<label class="field"><span>お子さんの「なぜ？」</span><textarea class="why" data-name="" maxlength="300" placeholder="例：どうして虫は光に集まるの？（お名前もどうぞ）">${esc(prevWhy[''] || Object.values(prevWhy).join('\n'))}</textarea></label>`}
+    </div>
+    <div class="card">
+      <label class="opt" style="margin:0"><input type="checkbox" id="share"${p.share ? ' checked' : ''}><span>感想を、サイトやSNSで紹介してもOK<br><span class="note">お名前は出しません</span></span></label>
+    </div>
+    <div class="err" id="ferr" hidden></div>
+    <button class="btn line" id="go">${me.prev ? 'この内容で送り直す' : '送る'}</button>`);
+
+  let stars = p.stars || 0;
+  const paint = () => {
+    app.querySelectorAll('#stars button').forEach(b => b.classList.toggle('on', Number(b.dataset.n) <= stars));
+    $('#starlabel').textContent = STAR_TEXT[stars] || '星をタップしてください';
+  };
+  app.querySelectorAll('#stars button').forEach(b => b.onclick = () => { stars = Number(b.dataset.n); paint(); });
+  paint();
+
+  $('#go').onclick = async () => {
+    const warn = msg => { const e = $('#ferr'); e.textContent = msg; e.hidden = false; e.scrollIntoView({ block: 'center', behavior: 'smooth' }); };
+    if (!stars) return warn('1 の「いかがでしたか？」の星をタップしてください。');
+    const again = (app.querySelector('input[name=again]:checked') || {}).value || '';
+    if (!again) return warn('2 の「また参加したいですか？」をえらんでください。');
+    let answer = '';
+    if (sv) {
+      if (choices) {
+        answer = (app.querySelector('input[name=ans]:checked') || {}).value || '';
+        if (/^その他/.test(answer) && $('#other') && $('#other').value.trim()) answer += '：' + $('#other').value.trim();
+      } else answer = $('#ans').value.trim();
+    }
+    const body = {
+      classId: cls.id, stars, again, comment: $('#comment').value.trim(),
+      question: sv ? sv.q : '', answer,
+      whys: [...app.querySelectorAll('textarea.why')].map(t => ({ name: t.dataset.name, text: t.value.trim() })),
+      share: $('#share').checked, name: $('#nm') ? $('#nm').value.trim() : '',
+    };
+    loading('送っています…');
+    const r = await api('survey', body);
+    if (!r.ok) return form(r.error === 'stars' ? '星をえらんでください。' : '送れませんでした。もう一度お試しください。');
+    me.prev = { ...body, whys: body.whys.filter(w => w.text).map(w => (w.name ? w.name + '：' : '') + w.text).join('\n') };
+    done(body);
+  };
+}
+
+function done(body) {
+  const anyWhy = body.whys.some(w => w.text);
+  try { if (window.gtag) gtag('event', 'survey_complete', { class_id: cls.id }); } catch (_) {}
+  const inClient = (() => { try { return !DEMO && liff.isInClient(); } catch (_) { return false; } })();
+  view(`<div class="card done"><img src="/assets/img/chara/blue-3.webp" alt="">
+      <h1>ありがとうございました！</h1>
+      <p class="sub">いただいた声は、これからの授業づくりに生かします🌱</p>
+      ${anyWhy ? '<div class="sum">❓ お子さんの「なぜ？」は先生に届けます。答えは、LINEやInstagramで紹介することがあります。お楽しみに！</div>' : ''}
+      <p style="margin-top:14px"><button class="btn sub" id="edit">答えを直す</button></p>
+      ${inClient ? '<p style="margin-top:10px"><button class="btn sub" id="close">とじる</button></p>' : ''}</div>`);
+  $('#edit').onclick = () => form();
+  $('#close') && ($('#close').onclick = () => liff.closeWindow());
+}
+</script>
+</body>
+</html>
