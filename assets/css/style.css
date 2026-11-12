@@ -1524,4 +1524,6 @@ img.dd { height: auto; pointer-events: none; filter: drop-shadow(0 3px 0 rgba(38
 .sh-x { background: #111; }
 .sh-facebook { background: #1877F2; }
 .sh-copy { background: #fff; color: var(--ink); }
+.sh-threads { background: #111; }
+.share-note { margin: 10px 0 0; font-size: .78rem; color: var(--ink-2); font-weight: 700; }
 @media (max-width: 600px) { .share-btn { font-size: .82rem; padding: .55em .9em .55em .7em; } }
