@@ -92,9 +92,10 @@
   /* ------- print (receipts) ------- */
   #printArea{display:none}
   @media print{
-    body *{visibility:hidden}
-    #printArea,#printArea *{visibility:visible}
-    #printArea{display:block;position:absolute;left:0;top:0;width:100%}
+    /* 印刷するものだけを残す。名簿のあとで改ページできるように、印刷部分はふつうの流れに置く（2026-11-12） */
+    body>*:not(#printArea){display:none!important}
+    body{background:#fff!important}
+    #printArea{display:block;position:static;width:100%}
     @page{size:A4;margin:12mm}
   }
   .receipt{border:1.5px solid #333;border-radius:4px;padding:10px 14px;margin-bottom:8px;display:grid;grid-template-columns:1fr 1fr;gap:0;page-break-inside:avoid;font-family:"Yu Mincho","Hiragino Mincho ProN",serif}
@@ -111,6 +112,27 @@
   /* 背景色は印刷されない設定でも画像は出るが、念のため強制 */
   @media print{ .rfoot-logo,.hdr-logo{-webkit-print-color-adjust:exact;print-color-adjust:exact} }
   .cutmark{text-align:center;color:#999;font-size:11px;border-top:1px dashed #bbb;margin:2px 0 10px}
+  /* ------- print (授業の名簿シート) 2026-11-12 ------- */
+  .pbreak{break-before:page;page-break-before:always}
+  .sheet{font-family:"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;color:#111;font-size:10.5px;line-height:1.55}
+  .sh-head{display:flex;align-items:center;gap:8px;border-bottom:2px solid #111;padding-bottom:4px;margin-bottom:6px}
+  .sh-head img{width:26px;height:26px;object-fit:contain;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sh-head .sh-org{font-weight:800;font-size:12px;flex:1}
+  .sh-head .sh-meta{font-size:11px}
+  .sh-title{font-size:17px;font-weight:800;margin:4px 0 8px;line-height:1.35}
+  .sheet h3{font-size:12px;font-weight:800;margin:10px 0 4px;padding:2px 6px;border-left:4px solid #111;background:#f1f1f1;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sh-info{width:100%;border-collapse:collapse;margin-bottom:4px}
+  .sh-info th{background:none;color:#111;width:52px;text-align:left;vertical-align:top;font-weight:800;padding:2px 6px 2px 0;white-space:nowrap}
+  .sh-info td{padding:2px 0}
+  .sh-list{width:100%;border-collapse:collapse;font-size:10px}
+  .sh-list th,.sh-list td{border:1px solid #444;padding:2px 4px;vertical-align:top}
+  .sh-list th{background:#e9e9e9;font-weight:800;white-space:nowrap;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sh-list tr{page-break-inside:avoid}
+  .sh-list .c{text-align:center}.sh-list .r{text-align:right;white-space:nowrap}
+  .sh-list .box{display:inline-block;width:11px;height:11px;border:1px solid #111}
+  .sh-list .sm{font-size:9px;color:#333}
+  .sh-sum{font-size:11px;margin:4px 0 0}
+  .sheet ul{margin:0;padding-left:1.3em}.sheet li{margin:1px 0}
 
   /* ======= サイトのデザインに合わせる（2026-11-12）。上の色の名前はそのまま、中身をサイトの色に置きかえる ======= */
   :root{
@@ -194,6 +216,8 @@
         <div><label>会員 料金（税込・円）</label><input type="number" id="ev-mem" value="3000"></div>
         <div><label>非会員 料金（税込・円）</label><input type="number" id="ev-non" value="4000"></div>
       </div>
+      <div style="margin-top:10px"><label>この回のメモ <span class="muted">（名簿の「注意事項」に、サイトの注意事項といっしょに印刷します。1行に1つ）</span></label>
+        <textarea id="ev-memo" rows="3" placeholder="例）保険：ワンタイムイベント保険に加入済み&#10;例）雨天時は事務所で実施"></textarea></div>
       <div style="margin-top:12px"><button class="btn" id="ev-save">この設定を保存</button>
       <span class="muted" id="ev-saved"></span></div>
     </div>
@@ -261,7 +285,9 @@
         <div>
           <button class="btn sec sm" id="ro-xlsx">参加者リスト（Excel）</button>
           <button class="btn ghost sm" id="ro-csv">CSV</button>
+          <button class="btn amber sm" id="ro-sheet">名簿を印刷</button>
           <button class="btn amber sm" id="ro-print">領収書を印刷</button>
+          <button class="btn amber sm" id="ro-both">名簿＋領収書を印刷</button>
           <button class="btn sm" id="ro-hist">今回を履歴に保存</button>
         </div>
       </div>
@@ -286,6 +312,15 @@
         <div><label>但し書き</label><input id="is-for"></div>
       </div>
       <div style="margin-top:10px"><button class="btn sm" id="is-save">保存</button></div>
+    </div>
+    <div class="card">
+      <h2>名簿に印刷するアナウンス</h2>
+      <p class="muted" style="margin:0 0 8px">③の「名簿を印刷」で、授業の最初と最後に話すことを名簿の下に印刷します。1行に1つ書いてください。<b>{次回}</b> と書いたところには、サイトの授業一覧から次の授業（日付・先生・タイトル）が自動で入ります。</p>
+      <label>授業の最初のアナウンス</label>
+      <textarea id="an-open" rows="7"></textarea>
+      <label style="margin-top:10px">授業の最後のアナウンス</label>
+      <textarea id="an-close" rows="3"></textarea>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm" id="an-save">保存</button><button class="btn ghost sm" id="an-reset">最初の文にもどす</button></div>
     </div>
     <div class="card">
       <h2>自動保存（ファイル）</h2>
@@ -603,7 +638,7 @@ async function adopt(d,label){
   try{ localStorage.setItem(K.fam,JSON.stringify(families)); localStorage.setItem(K.ev,JSON.stringify(events));
        localStorage.setItem(K.iss,JSON.stringify(issuer)); localStorage.setItem(K.draft,JSON.stringify(current)); }catch(e){}
   markModified(Date.parse(d.savedAt)||Date.now());   // ブラウザ内＝ファイルと同じ状態になった
-  loadEventForm(); loadIssuerForm(); renderAll(); renderHistory();
+  loadEventForm(); loadIssuerForm(); loadAnnForm(); renderAll(); renderHistory();
   $('dbstat').textContent='保存OK（'+families.length+'家族 登録済）';
   toast(label+'（'+families.length+'家族）');
 }
@@ -891,7 +926,7 @@ async function init(){
     date:todayISO(), no:'', title:'', mem:3000, non:4000, roster:[]
   };
   let persists=false; try{localStorage.setItem('__t','1');localStorage.removeItem('__t');persists=true;}catch(e){} document.getElementById('dbstat').textContent = persists? '保存OK（'+families.length+'家族 登録済）' : 'お試しモード（保存されません）';
-  loadEventForm(); loadSiteClasses(); loadIssuerForm(); addKidRow($('nf-kids')); renderAll(); renderHistory();
+  loadEventForm(); loadSiteClasses(); loadIssuerForm(); loadAnnForm(); addKidRow($('nf-kids')); renderAll(); renderHistory();
   initFileSave();
 }
 
@@ -906,7 +941,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
 // ---------- event tab ----------
 // ---------- サイトの授業一覧（/data/classes.json）から選ぶ ----------
 // アプリはサイトと同じ場所で動いているので、管理画面で登録した授業をそのまま読める
-let siteClasses=[];
+let siteClasses=[], siteTeachers=[];
 const WD='日月火水木金土';
 function classTitle(c){ return c.subtitle ? `${c.title} 〜${c.subtitle}〜` : c.title; }
 function classNo(c){ const [y,m]=c.date.split('-'); return y.slice(2)+m; }   // 例：2026-11 → 2611
@@ -915,6 +950,7 @@ async function loadSiteClasses(){
   try{
     const j=await (await fetch('/data/classes.json?t='+Date.now())).json();
     siteClasses=(Array.isArray(j)?j:j.classes).filter(c=>c.status!=='中止').sort((a,b)=>b.date.localeCompare(a.date));
+    try{ const t=await (await fetch('/data/teachers.json?t='+Date.now())).json(); siteTeachers=Array.isArray(t)?t:t.teachers; }catch(e){}
   }catch(e){ sel.innerHTML='<option value="">読み込めませんでした（手で入れてください）</option>'; return; }
   const today=todayISO();
   const opt=c=>{ const [y,m,d]=c.date.split('-').map(Number); const w=WD[new Date(y,m-1,d).getDay()];
@@ -934,11 +970,12 @@ document.getElementById('ev-pick').onchange=()=>{
 
 function loadEventForm(){
   $('ev-date').value=current.date; $('ev-no').value=current.no; $('ev-title').value=current.title;
-  $('ev-mem').value=current.mem; $('ev-non').value=current.non;
+  $('ev-mem').value=current.mem; $('ev-non').value=current.non; $('ev-memo').value=current.memo||'';
 }
 document.getElementById('ev-save').onclick=async()=>{
   current.date=$('ev-date').value; current.no=$('ev-no').value.trim(); current.title=$('ev-title').value.trim();
   current.mem=Number($('ev-mem').value)||0; current.non=Number($('ev-non').value)||0;
+  current.memo=$('ev-memo').value.trim();
   await store.set(K.draft, JSON.stringify(current));
   document.getElementById('ev-saved').textContent='✓ 保存しました';
   setTimeout(()=>document.getElementById('ev-saved').textContent='',2000);
@@ -1900,9 +1937,8 @@ document.getElementById('ro-xlsx').onclick=()=>{
 };
 
 // ---------- receipts print ----------
-document.getElementById('ro-print').onclick=()=>{
+function receiptsHTML(){
   const rows=current.roster.map(r=>({r,f:families.find(x=>x.id===r.familyId)})).filter(x=>x.f);
-  if(!rows.length){toast('参加者がいません');return;}
   const dstr=fmtDate(current.date);
   let html='';
   rows.forEach(({r,f},i)=>{
@@ -1919,14 +1955,87 @@ document.getElementById('ro-print').onclick=()=>{
     </div>`;
     html+=`<div class="receipt">${body(true)}${body(false)}</div><div class="cutmark">✂ ── ここで切る ──</div>`;
   });
-  document.getElementById('printArea').innerHTML=html;
-  window.print();
-};
+  return html;
+}
+
+// ---------- 授業の名簿シート（2026-11-12）----------
+// Excel の「〇〇授業応募者」シートと同じ中身：授業の概要・出席者・注意事項・最初と最後のアナウンス。
+// 「名簿＋領収書を印刷」で、名簿のあとに改ページして領収書を続けて印刷する
+const ANN_OPEN_DEFAULT=[
+  'トイレの場所：凝固剤を使ってください。ゴミはそのまま一緒に入れてください（燃えるゴミとして処分します）。',
+  '撮影の許可：SNSなどで授業の様子をアップするので、ご協力ください。顔出しNGの方は言ってください。',
+  '遊び回ってOKですが、地面が見えない草むらは急に傾斜になっている場所があり危険なので、入らないよう注意してください。',
+  '参加者の自己紹介（名前、今日は何を楽しみに来ましたか？）',
+  '里山ラボの意義：サイエンス里山ラボは、子どもたちが日常で感じる「なぜ？」を大切にしたいと考えて開催しています。今日もいろんな「なぜ？」が出てくると思います。「なぜ？」が出てきたら先生に聞いてみてください。',
+  'おうちに帰ってから「なぜ？」が出てくるかもしれません。そのときはぜひ、お父さんやお母さんと一緒に調べてみてください。今日実験したことをおうちの人と一緒におさらいすると、また色んなものに興味が出てきたり、疑問が湧いてきたりします。知らないことを知っていくことを楽しみましょう。'
+].join('\n');
+const ANN_CLOSE_DEFAULT=['アンケートのご協力','次回授業の告知：{次回}'].join('\n');
+function annOpen(){ return issuer.annOpen!=null?issuer.annOpen:ANN_OPEN_DEFAULT; }
+function annClose(){ return issuer.annClose!=null?issuer.annClose:ANN_CLOSE_DEFAULT; }
+function loadAnnForm(){ $('an-open').value=annOpen(); $('an-close').value=annClose(); }
+$('an-save').onclick=async()=>{ issuer={...issuer,annOpen:$('an-open').value,annClose:$('an-close').value}; await store.set(K.iss,JSON.stringify(issuer)); toast('アナウンスを保存しました'); };
+$('an-reset').onclick=()=>{ $('an-open').value=ANN_OPEN_DEFAULT; $('an-close').value=ANN_CLOSE_DEFAULT; toast('最初の文にもどしました（保存を押すと決まります）'); };
+function dateW(iso){ if(!iso)return''; const [y,m,d]=iso.split('-').map(Number); return `${y}年${m}月${d}日（${WD[new Date(y,m-1,d).getDay()]}）`; }
+function teacherLabel(id){ const t=siteTeachers.find(x=>x.id===id); if(!t)return''; return [String(t.org||'').replace(/\n/g,' '), t.name?t.name+' 先生':''].filter(Boolean).join(' '); }
+function thisClass(){ return siteClasses.find(c=>c.id===$('ev-pick').value && c.date===current.date) || siteClasses.find(c=>c.date===current.date) || null; }
+function nextClassText(){
+  const n=siteClasses.filter(c=>c.date>(current.date||'')).sort((a,b)=>a.date.localeCompare(b.date))[0];
+  if(!n) return '（サイトにまだ次の授業がありません）';
+  const [y,m,d]=n.date.split('-').map(Number), w=WD[new Date(y,m-1,d).getDay()];
+  return `${m}月${d}日（${w}）${teacherLabel(n.teacher)?' '+teacherLabel(n.teacher):''}　／　${classTitle(n)}`;
+}
+function lines(t){ return String(t||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean); }
+function sheetHTML(){
+  const rows=current.roster.map(r=>({r,f:families.find(x=>x.id===r.familyId)})).filter(x=>x.f);
+  const c=thisClass();
+  const time=c?[c.reception?'受付 '+c.reception:'', c.start?(c.start+(c.end?'〜'+c.end:'')):''].filter(Boolean).join('　'):'';
+  let kidsN=0, adultsN=0, total=0, body='', n=0;
+  rows.forEach(({r,f})=>{
+    const mem=r.memberOverride!=null?r.memberOverride:f.member;
+    const ks=attendKids(r,f), ad=attendAdults(r,f), amt=amountFor(r,f);
+    kidsN+=ks.length; adultsN+=ad?ad.length:1; total+=amt;
+    const kk=ks.length?ks:[{name:'',reading:'',gender:'',grade:''}], span=kk.length;
+    const why=[f.reason?'理由：'+f.reason:'', f.source?'きっかけ：'+f.source:''].filter(Boolean).map(esc).join('<br>');
+    const note=[r.note||f.note||'', ad&&ad.length?'来る大人：'+ad.map(adultLabel).join('、'):''].filter(Boolean).map(esc).join('<br>');
+    kk.forEach((k,i)=>{ n++;
+      const kid=k.name?esc(k.name)+(k.reading?'<br><span class="sm">'+esc(k.reading)+'</span>':''):'—';
+      body+='<tr>'+(i===0?`<td class="c" rowspan="${span}"><span class="box"></span></td>`:'')+
+        `<td class="c">${n}</td>`+
+        (i===0?`<td class="c" rowspan="${span}">${mem?'◯':''}</td><td rowspan="${span}"><b>${esc(f.guardian)}</b></td>`:'')+
+        `<td>${kid}</td><td class="c">${esc(k.gender||'')}</td><td class="c">${esc(gradeNow(k)||'')}</td>`+
+        (i===0?`<td rowspan="${span}">${esc(f.area||'')}</td><td rowspan="${span}" class="sm">${why}</td><td rowspan="${span}" class="sm">${note}</td><td class="c" rowspan="${span}">${headCount(r,f)}</td><td class="r" rowspan="${span}">${yen(amt)}</td>`:'')+
+        '</tr>';
+    });
+  });
+  const notes=[...((c&&c.notes)||[]), ...lines(current.memo)];
+  const li=a=>a.length?'<ul>'+a.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p>（なし）</p>';
+  const nx=nextClassText();
+  return `<div class="sheet">
+    <div class="sh-head"><img src="${ICON}" alt=""><span class="sh-org">サイエンス里山ラボ宗像　授業参加者名簿</span><span class="sh-meta">${current.no?'授業No. '+esc(current.no)+'　':''}${esc(dateW(current.date))}</span></div>
+    <div class="sh-title">${esc(current.title||(c?classTitle(c):''))}</div>
+    <table class="sh-info">
+      <tr><th>日時</th><td>${esc(dateW(current.date))}${time?'　'+esc(time):''}</td></tr>
+      ${c&&teacherLabel(c.teacher)?`<tr><th>講師</th><td>${esc(teacherLabel(c.teacher))}</td></tr>`:''}
+      ${c&&c.description?`<tr><th>概要</th><td>${esc(c.description)}</td></tr>`:''}
+    </table>
+    <h3>出席者</h3>
+    ${rows.length?`<table class="sh-list"><thead><tr><th>受付</th><th>No.</th><th>会員</th><th>保護者</th><th>お子さま</th><th>性別</th><th>学年</th><th>住まい</th><th>参加理由・きっかけ</th><th>備考</th><th>人数</th><th>金額</th></tr></thead><tbody>${body}</tbody></table>
+    <p class="sh-sum">家族 <b>${rows.length}</b> 組　／　大人 <b>${adultsN}</b> 人　／　お子さま <b>${kidsN}</b> 人　／　合計 <b>${yen(total)}</b></p>`:'<p>（まだ参加者がいません）</p>'}
+    <h3>注意事項</h3>${li(notes)}
+    <h3>授業の最初のアナウンス</h3>${li(lines(annOpen()).map(x=>x.replace(/\{次回\}/g,nx)))}
+    <h3>授業の最後のアナウンス</h3>${li(lines(annClose()).map(x=>x.replace(/\{次回\}/g,nx)))}
+  </div>`;
+}
+function printWith(html){ document.getElementById('printArea').innerHTML=html; window.print(); }
+function hasRoster(){ if(!current.roster.some(r=>families.find(x=>x.id===r.familyId))){ toast('参加者がいません'); return false; } return true; }
+document.getElementById('ro-print').onclick=()=>{ if(hasRoster()) printWith(receiptsHTML()); };
+document.getElementById('ro-sheet').onclick=()=>printWith(sheetHTML());
+document.getElementById('ro-both').onclick=()=>{ if(hasRoster()) printWith(sheetHTML()+'<div class="pbreak"></div>'+receiptsHTML()); };
 
 // ---------- issuer settings ----------
 function loadIssuerForm(){$('is-addr').value=issuer.addr;$('is-place').value=issuer.place;$('is-name').value=issuer.name;$('is-tel').value=issuer.tel;$('is-for').value=issuer.forwhat;}
 document.getElementById('is-save').onclick=async()=>{
-  issuer={addr:$('is-addr').value,place:$('is-place').value,name:$('is-name').value,tel:$('is-tel').value,forwhat:$('is-for').value};
+  issuer={...issuer,addr:$('is-addr').value,place:$('is-place').value,name:$('is-name').value,tel:$('is-tel').value,forwhat:$('is-for').value};
   await store.set(K.iss,JSON.stringify(issuer)); toast('発行者情報を保存しました');
 };
 
@@ -2031,7 +2140,7 @@ document.getElementById('bk-file').onchange=(e)=>{
     current.roster=current.roster.filter(r=>families.some(f=>f.id===r.familyId));
     await store.set(K.fam,JSON.stringify(families)); await store.set(K.ev,JSON.stringify(events));
     await store.set(K.iss,JSON.stringify(issuer)); await store.set(K.draft,JSON.stringify(current));
-    loadIssuerForm(); renderAll(); renderHistory();
+    loadIssuerForm(); loadAnnForm(); renderAll(); renderHistory();
     $('dbstat').textContent='保存OK（'+families.length+'家族 登録済）';
     toast('復元しました（'+families.length+'家族）');
   };
