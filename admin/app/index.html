@@ -130,7 +130,11 @@
   .sh-list tr{page-break-inside:avoid}
   .sh-list .c{text-align:center}.sh-list .r{text-align:right;white-space:nowrap}
   .sh-list .box{display:inline-block;width:11px;height:11px;border:1px solid #111}
-  .sh-list .sm{font-size:9px;color:#333}
+  .sh-list .sm{font-size:8.5px;line-height:1.4;color:#333}
+  /* 保護者・お子さまの名前は1行に（2026-11-12）。そのぶん理由・備考の文字を小さくして幅をゆずる */
+  .sh-list .nw{white-space:nowrap}
+  .sh-list .rd{font-size:8.5px;color:#555;margin-left:2px}
+  .sh-list .why{min-width:150px}.sh-list .memo{min-width:70px}
   .sh-sum{font-size:11px;margin:4px 0 0}
   .sheet ul{margin:0;padding-left:1.3em}.sheet li{margin:1px 0}
 
@@ -1998,12 +2002,12 @@ function sheetHTML(){
     const why=[f.reason?'理由：'+f.reason:'', f.source?'きっかけ：'+f.source:''].filter(Boolean).map(esc).join('<br>');
     const note=[r.note||f.note||'', ad&&ad.length?'来る大人：'+ad.map(adultLabel).join('、'):''].filter(Boolean).map(esc).join('<br>');
     kk.forEach((k,i)=>{ n++;
-      const kid=k.name?esc(k.name)+(k.reading?'<br><span class="sm">'+esc(k.reading)+'</span>':''):'—';
+      const kid=k.name?esc(k.name)+(k.reading?'<span class="rd">（'+esc(k.reading)+'）</span>':''):'—';
       body+='<tr>'+(i===0?`<td class="c" rowspan="${span}"><span class="box"></span></td>`:'')+
         `<td class="c">${n}</td>`+
-        (i===0?`<td class="c" rowspan="${span}">${mem?'◯':''}</td><td rowspan="${span}"><b>${esc(f.guardian)}</b></td>`:'')+
-        `<td>${kid}</td><td class="c">${esc(k.gender||'')}</td><td class="c">${esc(gradeNow(k)||'')}</td>`+
-        (i===0?`<td rowspan="${span}">${esc(f.area||'')}</td><td rowspan="${span}" class="sm">${why}</td><td rowspan="${span}" class="sm">${note}</td><td class="c" rowspan="${span}">${headCount(r,f)}</td><td class="r" rowspan="${span}">${yen(amt)}</td>`:'')+
+        (i===0?`<td class="c" rowspan="${span}">${mem?'◯':''}</td><td class="nw" rowspan="${span}"><b>${esc(f.guardian)}</b></td>`:'')+
+        `<td class="nw">${kid}</td><td class="c">${esc(k.gender||'')}</td><td class="c">${esc(gradeNow(k)||'')}</td>`+
+        (i===0?`<td class="nw" rowspan="${span}">${esc(f.area||'')}</td><td rowspan="${span}" class="sm why">${why}</td><td rowspan="${span}" class="sm memo">${note}</td><td class="c" rowspan="${span}">${headCount(r,f)}</td><td class="r" rowspan="${span}">${yen(amt)}</td>`:'')+
         '</tr>';
     });
   });
