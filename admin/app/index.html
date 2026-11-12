@@ -1999,7 +1999,7 @@ function surveyUrl(){ const c=thisClass(); return c? SURVEY_LIFF+'?c='+encodeURI
 function showSurveyUrl(){ const u=surveyUrl(); $('sv-url').value=u||'（①で授業をえらぶと出ます）'; }
 // 配信文（URLは本文の最後に自動でつける）。書き直した本文はこのブラウザに残す
 const SV_MSG_KEY='sato_survey_msg';
-const SV_MSG_DEFAULT='今日はご参加ありがとうございました！\n1分で終わるアンケートにご協力ください。お子さんが見つけた「なぜ？」も、ぜひ書いてくださいね。答えはLINEやInstagramで紹介させてください。';
+const SV_MSG_DEFAULT='今日はご参加ありがとうございました！😊\n1分で終わるアンケートにご協力ください🙏\nお子さんが見つけた「なぜ？」も、ぜひ書いてくださいね✏️\n答えはLINEやInstagramで紹介させてください📷✨';
 function svMsgBody(){ try{ return localStorage.getItem(SV_MSG_KEY)||SV_MSG_DEFAULT; }catch(e){ return SV_MSG_DEFAULT; } }
 $('sv-msg').value=svMsgBody();
 $('sv-msg').oninput=()=>{ try{ localStorage.setItem(SV_MSG_KEY,$('sv-msg').value); }catch(e){} };
