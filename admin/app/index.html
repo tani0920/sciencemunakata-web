@@ -128,6 +128,9 @@
   .sh-list th,.sh-list td{border:1px solid #444;padding:2px 4px;vertical-align:top}
   .sh-list th{background:#e9e9e9;font-weight:800;white-space:nowrap;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .sh-list tr{page-break-inside:avoid}
+  /* 1つの家族の行は、ページの途中で分けない（2026-11-12） */
+  .sh-list tbody.famg{break-inside:avoid;page-break-inside:avoid}
+  .sh-list thead{display:table-header-group}
   .sh-list .c{text-align:center}.sh-list .r{text-align:right;white-space:nowrap}
   .sh-list .box{display:inline-block;width:11px;height:11px;border:1px solid #111}
   .sh-list .sm{font-size:8.5px;line-height:1.4;color:#333}
@@ -2014,6 +2017,7 @@ function sheetHTML(){
     const why=[f.reason?'理由：'+f.reason:'', f.source?'きっかけ：'+f.source:''].filter(Boolean).map(esc).join('<br>');
     // この回の備考と、家族の備考（家族メモ）は別のもの。両方あれば両方出す（2026-11-12）
     const note=[r.note?esc(r.note):'', f.note?'<b>家族メモ：</b>'+esc(f.note):''].filter(Boolean).join('<br>');
+    body+='<tbody class="famg">';
     people.forEach((q,i)=>{
       body+='<tr'+(i===0?' class="fam"':'')+'>'+
         (i===0?`<td class="c" rowspan="${span}"><span class="box"></span></td><td class="c" rowspan="${span}">${fno}</td><td class="c" rowspan="${span}">${mem?'◯':''}</td><td class="nw" rowspan="${span}"><b>${esc(f.guardian)}</b></td>`:'')+
@@ -2021,6 +2025,7 @@ function sheetHTML(){
         (i===0?`<td class="nw" rowspan="${span}">${esc(f.area||'')}</td><td rowspan="${span}" class="sm why">${why}</td><td rowspan="${span}" class="sm memo">${note}</td><td class="c" rowspan="${span}"><b>${headCount(r,f)}</b></td><td class="r" rowspan="${span}">${yen(amt)}</td>`:'')+
         '</tr>';
     });
+    body+='</tbody>';
   });
   const notes=[...((c&&c.notes)||[]), ...lines(current.memo)];
   const li=a=>a.length?'<ul>'+a.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p>（なし）</p>';
@@ -2034,7 +2039,7 @@ function sheetHTML(){
       ${c&&c.description?`<tr><th>概要</th><td>${esc(c.description)}</td></tr>`:''}
     </table>
     <h3>出席者</h3>
-    ${rows.length?`<table class="sh-list"><thead><tr><th>受付</th><th>No.</th><th>会員</th><th>保護者（宛名）</th><th>続柄</th><th>来る人</th><th>性別</th><th>学年</th><th>住まい</th><th>参加理由・きっかけ</th><th>備考</th><th>人数</th><th>金額</th></tr></thead><tbody>${body}</tbody></table>
+    ${rows.length?`<table class="sh-list"><thead><tr><th>受付</th><th>No.</th><th>会員</th><th>保護者（宛名）</th><th>続柄</th><th>来る人</th><th>性別</th><th>学年</th><th>住まい</th><th>参加理由・きっかけ</th><th>備考</th><th>人数</th><th>金額</th></tr></thead>${body}</table>
     <p class="sh-sum">家族 <b>${rows.length}</b> 組　／　大人 <b>${adultsN}</b> 人　／　お子さま <b>${kidsN}</b> 人　／　合計 <b>${yen(total)}</b></p>`:'<p>（まだ参加者がいません）</p>'}
     <h3>注意事項</h3>${li(notes)}
     <h3>授業の最初のアナウンス</h3>${li(lines(annOpen()).map(x=>x.replace(/\{次回\}/g,nx)))}
