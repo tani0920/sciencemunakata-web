@@ -36,7 +36,9 @@
       const b = e.target.closest('.share-btn'); if (!b) return;
       track(b.dataset.m);
       if (b.dataset.m === 'native') {
-        try { await navigator.share({ title: document.title, text, url }); } catch (err) {}
+        // iPhone のシェア画面は、url を別に渡すと X・Threads が URL だけを受け取って文が消える。
+        // 文の中に URL を入れて text だけで渡す（Facebook は運営ルールで文の自動入力ができないので、どの方法でもリンクだけになる）
+        try { await navigator.share({ text: t2 }); } catch (err) {}
       } else if (b.dataset.m === 'copy') {
         const sp = b.querySelector('span');
         try { await navigator.clipboard.writeText(url); sp.textContent = 'コピーしました！'; }
