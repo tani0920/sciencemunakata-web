@@ -20,25 +20,36 @@
     const text = box.dataset.shareText || document.title;
     const lead = box.dataset.shareLead || '';
     const a = (k, label, href) => `<a class="share-btn sh-${k}" href="${href}" target="_blank" rel="noopener" data-m="${k}">${SVG[k]}<span>${label}</span></a>`;
-    // スマホ：X・Facebook・Threads は、ブラウザのシェア用ページだとアプリにうまく渡らない（ログインを聞かれる・投稿画面が出ない）。
-    // スマホでは「シェアする」（端末のシェア画面＝アプリに直接渡せる）にまとめ、PCでは各SNSのボタンを出す（2026-11-12）
+    // スマホ（2026-11-12 iPhone で確認）
+    // - 端末のシェア画面だと、X は URL だけ、Threads は url を別に渡すと URL だけ・文に入れると文だけになる。
+    //   → X と Threads は専用ボタンにする。X はアプリを直接ひらく（twitter://、アプリがなければブラウザ版へ）、
+    //     Threads は公式のシェア用URL（入っていればアプリがひらく、と Meta の説明にある）。
+    // - Facebook はルールで文を自動入力できないので、「シェアする」からリンクだけ渡す。
     const mobile = !!navigator.share && matchMedia('(pointer: coarse)').matches;
     const t2 = `${text}\n${url}`;
+    const xWeb = `https://x.com/intent/post?text=${enc(text)}&url=${enc(url)}`;
+    const thUrl = `https://www.threads.com/intent/post?text=${enc(t2)}`;
     box.innerHTML = `${lead ? `<p class="share-lead">${lead}</p>` : ''}<div class="share-btns">
       ${mobile ? `<button class="share-btn sh-share" type="button" data-m="native">${SVG.share}<span>シェアする</span></button>` : ''}
       ${a('line', 'LINE', `https://social-plugins.line.me/lineit/share?url=${enc(url)}&text=${enc(text)}`)}
-      ${mobile ? '' : a('x', 'X', `https://x.com/intent/post?text=${enc(text)}&url=${enc(url)}`)
-        + a('facebook', 'Facebook', `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`)
-        + a('threads', 'Threads', `https://www.threads.com/intent/post?text=${enc(t2)}`)}
+      ${mobile ? `<a class="share-btn sh-x" href="${xWeb}" data-m="x" data-app="twitter://post?message=${enc(t2)}">${SVG.x}<span>X</span></a>` : a('x', 'X', xWeb)}
+      ${mobile ? '' : a('facebook', 'Facebook', `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`)}
+      ${a('threads', 'Threads', thUrl)}
       <button class="share-btn sh-copy" type="button" data-m="copy">${SVG.link}<span>リンクをコピー</span></button>
-    </div>${mobile ? '<p class="share-note">Instagram・Threads・X などへは「シェアする」から</p>' : ''}`;
+    </div>${mobile ? '<p class="share-note">Facebook・Instagram などへは「シェアする」から</p>' : ''}`;
     box.addEventListener('click', async e => {
       const b = e.target.closest('.share-btn'); if (!b) return;
       track(b.dataset.m);
       if (b.dataset.m === 'native') {
-        // iPhone のシェア画面は、url を別に渡すと X・Threads が URL だけを受け取って文が消える。
-        // 文の中に URL を入れて text だけで渡す（Facebook は運営ルールで文の自動入力ができないので、どの方法でもリンクだけになる）
-        try { await navigator.share({ text: t2 }); } catch (err) {}
+        try { await navigator.share({ text, url }); } catch (err) {}
+      } else if (b.dataset.app) {  // X：アプリをひらく。1.5秒たってもページに残っていたら（アプリがない）ブラウザ版へ
+        e.preventDefault();
+        // 一度でもページが隠れたら（＝アプリがひらいた）、もどってきてもブラウザ版へは行かない
+        const web = b.href; let left = false;
+        const onHide = () => { if (document.hidden) left = true; };
+        document.addEventListener('visibilitychange', onHide);
+        location.href = b.dataset.app;
+        setTimeout(() => { document.removeEventListener('visibilitychange', onHide); if (!left && !document.hidden) location.href = web; }, 1500);
       } else if (b.dataset.m === 'copy') {
         const sp = b.querySelector('span');
         try { await navigator.clipboard.writeText(url); sp.textContent = 'コピーしました！'; }
