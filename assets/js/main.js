@@ -166,7 +166,16 @@
     const el = $('#nextCard');
     if (!up.length) {
       el.classList.add('next-empty');
+      // 準備中の絵：カレンダーにえんぴつで書きこみ中＋フラスコがぽこぽこ
       el.innerHTML = `<span class="next-label">つぎの授業</span>
+        <div class="next-prep" aria-hidden="true">
+          <img class="np-cal" src="assets/img/icons/calendar.webp" alt="">
+          <span class="np-q">？</span>
+          <img class="np-pen" src="assets/img/deco/pencil.webp" alt="">
+          <span class="np-flask"><img src="assets/img/deco/flask.webp" alt=""><i></i><i></i><i></i></span>
+          <img class="np-star" src="assets/img/deco/star.webp" alt="">
+          <span class="np-tag">じゅんびちゅう<b>.</b><b>.</b><b>.</b></span>
+        </div>
         <div class="next-body"><h3>つぎの授業はただいま準備中！</h3><p class="sub">決まったらLINEでいちばんにお知らせします。</p></div>
         <div class="next-side"><a class="btn btn-line" href="${esc(SITE.lineUrl)}" target="_blank" rel="noopener">${lineIcon}友だち追加</a></div>
         <img class="next-chara" src="${CH}pink-5.webp" alt="">`;

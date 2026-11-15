@@ -1544,3 +1544,25 @@ img.dd { height: auto; pointer-events: none; filter: drop-shadow(0 3px 0 rgba(38
 .class-card .cc-photo { position: relative; }
 .cc-cancel { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%) rotate(-6deg); background: var(--ink); color: #fff; font-weight: 900; font-size: 1.3rem; letter-spacing: .08em; border: 3px solid #fff; border-radius: 12px; padding: .3em 1em; box-shadow: 0 4px 0 rgba(0,0,0,.25); white-space: nowrap; }
 .class-card:has(.cc-cancel) .cc-photo img { filter: grayscale(.6) brightness(.85); }
+
+/* つぎの授業：準備中のときの絵 2026-11-15 */
+.next-prep { position: relative; aspect-ratio: 1; border: 3px solid var(--ink); border-radius: 18px; transform: rotate(-2deg); box-shadow: 0 5px 0 var(--ink); background: var(--sun-l); background-image: radial-gradient(rgba(255,255,255,.9) 2px, transparent 2.5px); background-size: 18px 18px; overflow: hidden; }
+.next-prep img { position: absolute; display: block; }
+.np-cal { width: 56%; left: 14%; top: 14%; transform: rotate(-6deg); }
+.np-q { position: absolute; left: 47%; top: 43%; width: 2.1em; height: 2.1em; display: grid; place-items: center; font-family: var(--pop); font-size: 1.15rem; color: #fff; background: var(--pink); border: 3px solid var(--ink); border-radius: 50%; animation: pop 2.4s ease-in-out infinite; }
+.np-pen { width: 34%; right: 6%; top: 8%; transform-origin: 15% 85%; animation: np-write 1.6s ease-in-out infinite; }
+.np-flask { position: absolute; width: 30%; left: 6%; bottom: 13%; }
+.np-flask img { position: relative; width: 100%; }
+.np-flask i { position: absolute; left: 46%; top: 6%; width: 9px; height: 9px; border: 2.5px solid var(--blue); border-radius: 50%; background: #fff; opacity: 0; animation: np-bubble 2.4s ease-in infinite; }
+.np-flask i:nth-of-type(2) { left: 30%; animation-delay: .8s; width: 7px; height: 7px; }
+.np-flask i:nth-of-type(3) { left: 60%; animation-delay: 1.6s; }
+.np-star { width: 17%; right: 9%; bottom: 26%; animation: twinkle 2.8s ease-in-out infinite; }
+.np-tag { position: absolute; right: 7%; bottom: 7%; font-family: var(--pop); font-size: .82rem; color: #fff; background: var(--ink); border-radius: 999px; padding: .15em .8em; transform: rotate(-3deg); white-space: nowrap; }
+.np-tag b { font-weight: 400; animation: np-dot 1.5s infinite; }
+.np-tag b:nth-child(2) { animation-delay: .25s; }
+.np-tag b:nth-child(3) { animation-delay: .5s; }
+@keyframes np-write { 0%, 100% { transform: rotate(0) translate(0, 0); } 25% { transform: rotate(-8deg) translate(-4px, 3px); } 50% { transform: rotate(2deg) translate(-8px, 6px); } 75% { transform: rotate(-6deg) translate(-3px, 4px); } }
+@keyframes np-bubble { 0% { opacity: 0; transform: translateY(0) scale(.6); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-46px) scale(1.1); } }
+@keyframes np-dot { 0%, 60%, 100% { opacity: .25; } 30% { opacity: 1; } }
+@media (max-width: 860px) { .next-prep { max-width: 220px; width: 100%; margin: 0 auto 6px; } }
+@media (prefers-reduced-motion: reduce) { .next-prep * { animation: none !important; } .np-flask i { display: none; } }
