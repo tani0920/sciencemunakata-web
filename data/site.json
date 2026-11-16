@@ -42,16 +42,17 @@
   },
   {
    "title": "むなかた虫そだて日記",
-   "desc": "つかまえた虫を、1週間おせわしてそだててみよう。",
-   "url": "",
-   "status": "soon",
+   "desc": "宗像で見つけた虫を、おうちの虫かごでそだてて、もとの場所にかえそう。幼虫・さなぎ・羽化までを1週間で。",
+   "url": "https://tani0920.github.io/mushitori-ikusei/",
+   "status": "open",
    "chara": "pink-5",
    "image": "assets/img/games/mushisodate.webp",
    "tags": [
     "free",
     "browser",
     "tablet"
-   ]
+   ],
+   "page": "mushisodate/"
   },
   {
    "title": "里山ラボ サイエンスアプリ",
