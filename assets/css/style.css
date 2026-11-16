@@ -1606,3 +1606,21 @@ img.dd { height: auto; pointer-events: none; filter: drop-shadow(0 3px 0 rgba(38
   .g-spots { grid-template-columns: repeat(2, 1fr); }
   .g-shots-wide .g-shot { width: 240px; }
 }
+.g-bugs.g-bugs-wide { max-width: 640px; background: #fff; }
+.g-bugs figcaption { font-size: .85rem; font-weight: 700; color: var(--ink-2); text-align: center; margin-top: 6px; }
+/* 虫そだて日記：そとでスマホ → おうちでタブレット の流れ */
+.g-flow-list { list-style: none; padding: 0; margin: 16px 0 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; counter-reset: flow; }
+.g-flow-list li { position: relative; counter-increment: flow; }
+.g-flow-list li + li::before { content: "▶"; position: absolute; left: -24px; top: 22%; color: #D35400; font-size: 1.1rem; }
+.g-flow-list figure { position: relative; margin: 0 0 10px; }
+.g-flow-list figure::after { content: counter(flow); position: absolute; left: -8px; top: -10px; width: 2em; height: 2em; display: grid; place-items: center; font-family: var(--pop); background: #F4B63C; border: 3px solid var(--ink); border-radius: 50%; }
+.g-flow-list img { display: block; width: 100%; height: auto; border-radius: 14px; border: 3px solid var(--ink); box-shadow: 0 5px 0 var(--ink); }
+.g-flow-list .f-dev { display: inline-flex; align-items: center; gap: .3em; margin: 4px 0 2px; font-size: .76rem; font-weight: 900; white-space: nowrap; background: var(--sun-l); border: 2px solid var(--ink); border-radius: 999px; padding: .1em .8em .1em .5em; }
+.g-flow-list .f-dev img { width: 1.5em; height: 1.5em; border: 0; box-shadow: none; border-radius: 0; margin: -.15em 0; }
+.g-flow-list li:nth-child(3) .f-dev { background: var(--leaf-l); }
+.g-flow-list h3 { font-family: var(--pop); font-weight: 400; font-size: 1.15rem; margin: 4px 0; }
+.g-flow-list p:not(.f-dev) { font-size: .9rem; color: var(--ink-2); margin: 0; }
+@media (max-width: 760px) {
+  .g-flow-list { grid-template-columns: 1fr; gap: 34px; max-width: 420px; margin-left: auto; margin-right: auto; }
+  .g-flow-list li + li::before { content: "▼"; left: 50%; top: -28px; transform: translateX(-50%); }
+}
