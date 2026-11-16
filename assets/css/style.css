@@ -1639,3 +1639,9 @@ img.dd { height: auto; pointer-events: none; filter: drop-shadow(0 3px 0 rgba(38
 /* 虫そだて日記：流れの見出しは1行。せまい画面では言葉の切れ目（＆・！のあと）で折り返す */
 .f-h2 > span:last-child { word-break: keep-all; }
 @media (min-width: 1100px) { .doc h2.f-h2 { font-size: 1.2rem; } }
+/* 札を少しコンパクトに。見出しは言葉の切れ目で折り返す */
+.g-flow-list .f-tags { gap: 5px; }
+.g-flow-list .f-tags span { font-size: .76rem; padding: .12em .65em .12em .3em; gap: .25em; }
+.g-flow-list .f-tags .f-two { gap: .1em; }
+.g-flow-list .f-tags .f-two img + img { margin-right: .2em; }
+.g-flow-list h3 { word-break: keep-all; }
