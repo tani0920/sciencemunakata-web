@@ -37,7 +37,7 @@
   let SITE = {}, CLASSES = [], TEACHERS = [], NEWS = [], VIDEOS = [];
   Promise.all(['site', 'classes', 'teachers', 'news', 'videos', 'ruby'].map(load)).then(([s, c, t, n, v, r]) => {
     SITE = s; CLASSES = c; TEACHERS = t; NEWS = n; VIDEOS = v; setRuby(r); rubyStatic(); setAnalytics();
-    setLinks(); renderSNS(); renderHero(); renderNext(); renderGallery(); renderNews(); renderClasses(); renderTeachers(); renderVideos(); renderGames();
+    setLinks(); renderSNS(); loadIgFeed(); renderHero(); renderNext(); renderGallery(); renderNews(); renderClasses(); renderTeachers(); renderVideos(); renderGames();
     observeReveal(); watchLine();
   }).catch(err => {
     console.error(err);
@@ -137,7 +137,24 @@
         <span class="ig-text"><small>もっと見たい人は</small><b>Instagram で、授業のようすを発信中！</b><em>@${esc(ig.url.replace(/\/$/, '').split('/').pop())} をフォロー →</em></span>
         <img class="ig-chara" src="${CH}pink-2.webp" alt="">
       </a>
+      <div class="ig-feed" id="igFeed" hidden></div>
       ${others.length ? `<p class="sns-others">${others.map(s => `<a class="sns-pill sns-${esc(s.id)}" href="${esc(s.url)}" target="_blank" rel="noopener">${SNS_ICON[s.id] || ''}${esc(s.label)}${s.note ? `<small>${esc(s.note)}</small>` : ''}</a>`).join('')}</p>` : ''}`;
+  }
+
+  /* ───── Instagram の最新投稿（Apps Script 経由。帯が見えそうになってから読む） ───── */
+  const IG_FEED = 'https://script.google.com/macros/s/AKfycbxwrWoj9COdfvQTA8FFcYHzIxQurQJBEolSC26waR95pSui8ptOgZt_Z-cKKNqw6tVN/exec?action=igFeed';
+  function loadIgFeed() {
+    const box = $('#igFeed');
+    if (!box) return;
+    const go = () => fetch(IG_FEED).then(r => r.json()).then(j => {
+      const posts = (j && j.ok && j.posts || []).slice(0, 6);
+      if (posts.length < 3) return;
+      box.innerHTML = posts.map(p => `<a class="ig-post" href="${esc(p.url)}" target="_blank" rel="noopener" aria-label="Instagramの投稿${p.text ? '：' + esc(p.text) : ''}"><img src="${esc(p.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()">${p.video ? '<span class="ig-mark">▶</span>' : p.carousel ? '<span class="ig-mark">❐</span>' : ''}</a>`).join('');
+      box.hidden = false;
+    }).catch(() => {});
+    if (!('IntersectionObserver' in window)) return go();
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); go(); } }, { rootMargin: '600px' });
+    io.observe(box.parentNode);
   }
 
   /* ───── ヒーローの写真：数秒ごとにふわっと切り替わる ───── */

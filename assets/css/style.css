@@ -1566,3 +1566,13 @@ img.dd { height: auto; pointer-events: none; filter: drop-shadow(0 3px 0 rgba(38
 @keyframes np-dot { 0%, 60%, 100% { opacity: .25; } 30% { opacity: 1; } }
 @media (max-width: 860px) { .next-prep { max-width: 220px; width: 100%; margin: 0 auto 6px; } }
 @media (prefers-reduced-motion: reduce) { .next-prep * { animation: none !important; } .np-flask i { display: none; } }
+
+/* Instagram の最新投稿（帯の下に6枚）2026-11-16 */
+.ig-feed { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin: 16px 0 0; }
+.ig-post { position: relative; display: block; aspect-ratio: 1; border: 3px solid var(--ink); border-radius: 14px; overflow: hidden; background: var(--sun-l); box-shadow: 0 4px 0 var(--ink); transition: transform .15s; }
+.ig-post:nth-child(odd) { transform: rotate(-1.5deg); }
+.ig-post:nth-child(even) { transform: rotate(1.5deg); }
+.ig-post:hover { transform: rotate(0) scale(1.05); z-index: 1; }
+.ig-post img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ig-mark { position: absolute; right: 6px; top: 4px; color: #fff; font-size: .9rem; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+@media (max-width: 600px) { .ig-feed { grid-template-columns: repeat(3, 1fr); gap: 8px; } }
