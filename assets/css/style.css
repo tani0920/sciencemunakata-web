@@ -1627,3 +1627,15 @@ img.dd { height: auto; pointer-events: none; filter: drop-shadow(0 3px 0 rgba(38
 .g-flow-list .f-dev-long { white-space: normal; border-radius: 14px; line-height: 1.5; }
 .g-flow h2 { line-height: 1.5; }
 .g-steps .st-ic { display: block; width: 64px; height: 64px; object-fit: contain; margin: 0 auto 6px; }
+/* 虫そだて日記：「そと」「おうち」と、使うもののアイコン */
+.g-flow-list .f-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 4px; }
+.g-flow-list .f-tags span { display: inline-flex; align-items: center; gap: .3em; font-size: .8rem; font-weight: 900; border-radius: 999px; padding: .15em .75em .15em .35em; white-space: nowrap; }
+.g-flow-list .f-tags img { width: 1.7em; height: 1.7em; border: 0; box-shadow: none; border-radius: 0; margin: -.2em 0; }
+.g-flow-list .f-place { color: #fff; border: 2px solid var(--ink); }
+.g-flow-list .f-soto { background: #5DB63E; }
+.g-flow-list .f-uchi { background: #E8833A; }
+.g-flow-list .f-place img { background: #fff; border-radius: 50%; padding: 2px; }
+.g-flow-list .f-item { background: #fff; border: 2px solid var(--ink); }
+/* 虫そだて日記：流れの見出しは1行。せまい画面では言葉の切れ目（＆・！のあと）で折り返す */
+.f-h2 > span:last-child { word-break: keep-all; }
+@media (min-width: 1100px) { .doc h2.f-h2 { font-size: 1.2rem; } }
