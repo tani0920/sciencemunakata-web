@@ -481,7 +481,8 @@
   /* ───── あそぶ ───── */
   // ゲームの特長のしるし（site.json の games[].tags）
   const GAME_TAG = { free: '無料', browser: 'ダウンロードなし', tablet: 'お子さまはタブレットで' };
-  const gameTags = tags => (tags || []).length ? `<ul class="g-tags">${tags.filter(t => GAME_TAG[t]).map(t => `<li>${uiIcon(t)}${GAME_TAG[t]}</li>`).join('')}</ul>` : '';
+  // tagText：ゲームごとに言い方をかえる（例：虫そだて日記は「あそぶのは タブレット・パソコン」。紹介ページの文言に合わせる）
+  const gameTags = (tags, over) => (tags || []).length ? `<ul class="g-tags">${tags.filter(t => GAME_TAG[t]).map(t => `<li>${uiIcon(t)}${esc((over || {})[t] || GAME_TAG[t])}</li>`).join('')}</ul>` : '';
   function renderGames() {
     $('#gameGrid').innerHTML = (SITE.games || []).map(g => {
       const open = g.status === 'open' && g.url;
@@ -492,7 +493,7 @@
         ${g.badge ? `<span class="g-badge">${uiIcon('star')}${er(g.badge)}</span>` : ''}
         ${open ? `<a href="${esc(g.url)}" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">${visual}</a>` : visual}
         <div class="g-body"><h3>${er(g.title)}</h3><p>${er(g.desc)}</p>
-        ${gameTags(g.tags)}
+        ${gameTags(g.tags, g.tagText)}
         <div class="g-btns">${g.page ? `<a class="btn btn-sub g-info" href="${esc(g.page)}">ゲームの内容</a>` : ''}
         ${open ? `<a class="btn btn-main" href="${esc(g.url)}" target="_blank" rel="noopener">あそぶ ▶</a>` : '<span class="btn">もうすぐ公開</span>'}</div></div>
       </article>`;

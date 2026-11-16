@@ -1624,3 +1624,6 @@ img.dd { height: auto; pointer-events: none; filter: drop-shadow(0 3px 0 rgba(38
   .g-flow-list { grid-template-columns: 1fr; gap: 34px; max-width: 420px; margin-left: auto; margin-right: auto; }
   .g-flow-list li + li::before { content: "▼"; left: 50%; top: -28px; transform: translateX(-50%); }
 }
+.g-flow-list .f-dev-long { white-space: normal; border-radius: 14px; line-height: 1.5; }
+.g-flow h2 { line-height: 1.5; }
+.g-steps .st-ic { display: block; width: 64px; height: 64px; object-fit: contain; margin: 0 auto 6px; }

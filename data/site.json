@@ -52,7 +52,10 @@
     "browser",
     "tablet"
    ],
-   "page": "mushisodate/"
+   "page": "mushisodate/",
+   "tagText": {
+    "tablet": "あそぶのは タブレット・パソコン"
+   }
   },
   {
    "title": "里山ラボ サイエンスアプリ",
